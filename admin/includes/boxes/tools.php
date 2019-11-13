@@ -24,16 +24,6 @@
         'link' => tep_href_link('backup.php')
       ),
       array(
-        'code' => 'banner_manager.php',
-        'title' => BOX_TOOLS_BANNER_MANAGER,
-        'link' => tep_href_link('banner_manager.php')
-      ),
-      array(
-        'code' => 'cache.php',
-        'title' => BOX_TOOLS_CACHE,
-        'link' => tep_href_link('cache.php')
-      ),
-      array(
         'code' => 'define_language.php',
         'title' => BOX_TOOLS_DEFINE_LANGUAGE,
         'link' => tep_href_link('define_language.php')

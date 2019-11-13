@@ -729,18 +729,6 @@
   }
 
 ////
-// Sets the status of a banner
-  function tep_set_banner_status($banners_id, $status) {
-    if ($status == '1') {
-      return tep_db_query("update " . TABLE_BANNERS . " set status = '1', expires_impressions = NULL, expires_date = NULL, date_status_change = NULL where banners_id = '" . $banners_id . "'");
-    } elseif ($status == '0') {
-      return tep_db_query("update " . TABLE_BANNERS . " set status = '0', date_status_change = now() where banners_id = '" . $banners_id . "'");
-    } else {
-      return -1;
-    }
-  }
-
-////
 // Sets the status of a product
   function tep_set_product_status($products_id, $status) {
     if ($status == '1') {
@@ -939,11 +927,6 @@
     tep_db_query("delete from " . TABLE_CATEGORIES . " where categories_id = '" . (int)$category_id . "'");
     tep_db_query("delete from " . TABLE_CATEGORIES_DESCRIPTION . " where categories_id = '" . (int)$category_id . "'");
     tep_db_query("delete from " . TABLE_PRODUCTS_TO_CATEGORIES . " where categories_id = '" . (int)$category_id . "'");
-
-    if (USE_CACHE == 'true') {
-      tep_reset_cache_block('categories');
-      tep_reset_cache_block('also_purchased');
-    }
   }
 
   function tep_remove_product($product_id) {
@@ -988,11 +971,6 @@
       tep_db_query("delete from " . TABLE_REVIEWS_DESCRIPTION . " where reviews_id = '" . (int)$product_reviews['reviews_id'] . "'");
     }
     tep_db_query("delete from " . TABLE_REVIEWS . " where products_id = '" . (int)$product_id . "'");
-
-    if (USE_CACHE == 'true') {
-      tep_reset_cache_block('categories');
-      tep_reset_cache_block('also_purchased');
-    }
   }
 
   function tep_remove_order($order_id, $restock = false) {
@@ -1008,38 +986,6 @@
     tep_db_query("delete from " . TABLE_ORDERS_PRODUCTS_ATTRIBUTES . " where orders_id = '" . (int)$order_id . "'");
     tep_db_query("delete from " . TABLE_ORDERS_STATUS_HISTORY . " where orders_id = '" . (int)$order_id . "'");
     tep_db_query("delete from " . TABLE_ORDERS_TOTAL . " where orders_id = '" . (int)$order_id . "'");
-  }
-
-  function tep_reset_cache_block($cache_block) {
-    global $cache_blocks;
-
-    for ($i=0, $n=sizeof($cache_blocks); $i<$n; $i++) {
-      if ($cache_blocks[$i]['code'] == $cache_block) {
-        if ($cache_blocks[$i]['multiple']) {
-          if ($dir = @opendir(DIR_FS_CACHE)) {
-            while ($cache_file = readdir($dir)) {
-              $cached_file = $cache_blocks[$i]['file'];
-              $languages = tep_get_languages();
-              for ($j=0, $k=sizeof($languages); $j<$k; $j++) {
-                $cached_file_unlink = preg_replace('/-language/', '-' . $languages[$j]['directory'], $cached_file);
-                if (preg_match('/^' . $cached_file_unlink . '/', $cache_file)) {
-                  @unlink(DIR_FS_CACHE . $cache_file);
-                }
-              }
-            }
-            closedir($dir);
-          }
-        } else {
-          $cached_file = $cache_blocks[$i]['file'];
-          $languages = tep_get_languages();
-          for ($i=0, $n=sizeof($languages); $i<$n; $i++) {
-            $cached_file = preg_replace('/-language/', '-' . $languages[$i]['directory'], $cached_file);
-            @unlink(DIR_FS_CACHE . $cached_file);
-          }
-        }
-        break;
-      }
-    }
   }
 
   function tep_get_file_permissions($mode) {
@@ -1181,26 +1127,6 @@
 
       return $classes['tax_class_title'];
     }
-  }
-
-  function tep_banner_image_extension() {
-    if (function_exists('imagetypes')) {
-      if (imagetypes() & IMG_PNG) {
-        return 'png';
-      } elseif (imagetypes() & IMG_JPG) {
-        return 'jpg';
-      } elseif (imagetypes() & IMG_GIF) {
-        return 'gif';
-      }
-    } elseif (function_exists('imagecreatefrompng') && function_exists('imagepng')) {
-      return 'png';
-    } elseif (function_exists('imagecreatefromjpeg') && function_exists('imagejpeg')) {
-      return 'jpg';
-    } elseif (function_exists('imagecreatefromgif') && function_exists('imagegif')) {
-      return 'gif';
-    }
-
-    return false;
   }
 
 ////

@@ -109,9 +109,6 @@
   $cookie_domain = (($request_type == 'NONSSL') ? HTTP_COOKIE_DOMAIN : HTTPS_COOKIE_DOMAIN);
   $cookie_path = (($request_type == 'NONSSL') ? HTTP_COOKIE_PATH : HTTPS_COOKIE_PATH);
 
-// include cache functions if enabled
-  if (USE_CACHE == 'true') include('includes/functions/cache.php');
-
 // include shopping cart class
   require('includes/classes/shopping_cart.php');
 
@@ -330,11 +327,6 @@
 
 // split-page-results
   require('includes/classes/split_page_results.php');
-
-// auto activate and expire banners
-  require('includes/functions/banner.php');
-  tep_activate_banners();
-  tep_expire_banners();
 
 // auto expire special products
   require('includes/functions/specials.php');
