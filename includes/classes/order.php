@@ -240,6 +240,7 @@
 
       $this->customer = array('firstname' => $customer_address['customers_firstname'],
                               'lastname' => $customer_address['customers_lastname'],
+			      'name' => $customer_address['customers_firstname'] . ' ' . $customer_address['customers_lastname'],
                               'company' => $customer_address['entry_company'],
                               'street_address' => $customer_address['entry_street_address'],
                               'suburb' => $customer_address['entry_suburb'],
@@ -254,6 +255,7 @@
 
       $this->delivery = array('firstname' => $shipping_address['entry_firstname'],
                               'lastname' => $shipping_address['entry_lastname'],
+			      'name' => $shipping_address['entry_firstname'] . ' ' . $shipping_address['entry_lastname'],
                               'company' => $shipping_address['entry_company'],
                               'street_address' => $shipping_address['entry_street_address'],
                               'suburb' => $shipping_address['entry_suburb'],
@@ -267,6 +269,7 @@
 
       $this->billing = array('firstname' => $billing_address['entry_firstname'],
                              'lastname' => $billing_address['entry_lastname'],
+			     'name' => $billing_address['entry_firstname'] . ' ' . $billing_address['entry_lastname'],
                              'company' => $billing_address['entry_company'],
                              'street_address' => $billing_address['entry_street_address'],
                              'suburb' => $billing_address['entry_suburb'],
@@ -339,4 +342,3 @@
       }
     }
   }
-?>
