@@ -5,13 +5,26 @@
   osCommerce, Open Source E-Commerce Solutions
   http://www.oscommerce.com
 
-  Copyright (c) 2014 osCommerce
+  Copyright (c) 2019 osCommerce
 
   Released under the GNU General Public License
 */
 
   class sage_pay_server {
-    var $code, $title, $description, $enabled;
+
+    const REQUIRES = [
+      'firstname',
+      'lastname',
+      'street_address',
+      'city',
+      'postcode',
+      'country',
+      'telephone',
+      'email_address',
+    ];
+
+    public $code = 'sage_pay_server';
+    public $title, $description, $enabled;
 
     function __construct() {
       global $PHP_SELF, $order;
@@ -19,7 +32,6 @@
       $this->signature = 'sage_pay|sage_pay_server|2.0|2.3';
       $this->api_version = '3.00';
 
-      $this->code = 'sage_pay_server';
       $this->title = MODULE_PAYMENT_SAGE_PAY_SERVER_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_SAGE_PAY_SERVER_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_SAGE_PAY_SERVER_TEXT_DESCRIPTION;
@@ -280,14 +292,7 @@
       if ( MODULE_PAYMENT_SAGE_PAY_SERVER_PROFILE_PAGE == 'Low' ) {
         global $cart;
 
-        $cart->reset(true);
-
-// unregister session variables used during checkout
-        tep_session_unregister('sendto');
-        tep_session_unregister('billto');
-        tep_session_unregister('shipping');
-        tep_session_unregister('payment');
-        tep_session_unregister('comments');
+        require 'includes/modules/checkout/reset.php';
 
         tep_session_unregister('sage_pay_server_nexturl');
 
@@ -702,4 +707,3 @@ EOD;
       }
     }
   }
-?>
