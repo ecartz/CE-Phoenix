@@ -8,7 +8,7 @@
  Copyright (c) 2019 osCommerce
 
  Released under the GNU General Public License
- */
+*/
 
   $sql_data = [
     'customers_id' => $customer_id,
