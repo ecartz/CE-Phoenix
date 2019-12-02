@@ -1035,6 +1035,125 @@
     $message->send($to_name, $to_email_address, $from_email_name, $from_email_address, $email_subject);
   }
 
+  function tep_notify($area, $subject) {
+    switch ($area) {
+      case 'checkout':
+        // initialized for the email confirmation
+        $products_ordered = '';
+
+        foreach ($subject->products as $product) {
+          // Stock Update - Joao Correia
+          if (STOCK_LIMITED == 'true') {
+            if (DOWNLOAD_ENABLED == 'true') {
+              $stock_query_raw = "SELECT products_quantity, pad.products_attributes_filename
+                            FROM products p
+                            LEFT JOIN products_attributes pa
+                             ON p.products_id=pa.products_id
+                            LEFT JOIN products_attributes_download pad
+                             ON pa.products_attributes_id=pad.products_attributes_id
+                            WHERE p.products_id = '" . tep_get_prid($product['id']) . "'";
+              // Will work with only one option for downloadable products
+              // otherwise, we have to build the query dynamically with a loop
+              $products_attributes = (isset($product['attributes'])) ? $product['attributes'] : '';
+              if (is_array($products_attributes)) {
+                $stock_query_raw .= " AND pa.options_id = '" . (int)$products_attributes[0]['option_id'] . "' AND pa.options_values_id = '" . (int)$products_attributes[0]['value_id'] . "'";
+              }
+              $stock_query = tep_db_query($stock_query_raw);
+            } else {
+              $stock_query = tep_db_query("select products_quantity from products where products_id = '" . tep_get_prid($product['id']) . "'");
+            }
+            if (tep_db_num_rows($stock_query) > 0) {
+              $stock_values = tep_db_fetch_array($stock_query);
+              // do not decrement quantities if products_attributes_filename exists
+              if ((DOWNLOAD_ENABLED != 'true') || (!$stock_values['products_attributes_filename'])) {
+                $stock_left = $stock_values['products_quantity'] - $product['qty'];
+                tep_db_query("update products set products_quantity = '" . (int)$stock_left . "' where products_id = '" . tep_get_prid($product['id']) . "'");
+                if ( ($stock_left < 1) && (STOCK_ALLOW_CHECKOUT == 'false') ) {
+                  tep_db_query("update products set products_status = '0' where products_id = '" . tep_get_prid($product['id']) . "'");
+                }
+              }
+            }
+          }
+
+          // Update products_ordered (for bestsellers list)
+          tep_db_query("update products set products_ordered = products_ordered + " . sprintf('%d', $product['qty']) . " where products_id = '" . tep_get_prid($product['id']) . "'");
+
+          //------insert customer chosen option to order--------
+          $products_ordered_attributes = '';
+          if (isset($product['attributes'])) {
+            foreach ($product['attributes'] as $attribute) {
+              if (DOWNLOAD_ENABLED == 'true') {
+                $attributes_query = "select popt.products_options_name, poval.products_options_values_name, pa.options_values_price, pa.price_prefix, pad.products_attributes_maxdays, pad.products_attributes_maxcount , pad.products_attributes_filename
+                               from products_options popt, products_options_values poval, products_attributes pa
+                               left join products_attributes_download pad
+                                on pa.products_attributes_id=pad.products_attributes_id
+                               where pa.products_id = '" . (int)$product['id'] . "'
+                                and pa.options_id = '" . (int)$attribute['option_id'] . "'
+                                and pa.options_id = popt.products_options_id
+                                and pa.options_values_id = '" . (int)$attribute['value_id'] . "'
+                                and pa.options_values_id = poval.products_options_values_id
+                                and popt.language_id = '" . (int)$languages_id . "'
+                                and poval.language_id = '" . (int)$languages_id . "'";
+                $attributes = tep_db_query($attributes_query);
+              } else {
+                $attributes = tep_db_query("select popt.products_options_name, poval.products_options_values_name, pa.options_values_price, pa.price_prefix from products_options popt, products_options_values poval, products_attributes pa where pa.products_id = '" . (int)$product['id'] . "' and pa.options_id = '" . (int)$attribute['option_id'] . "' and pa.options_id = popt.products_options_id and pa.options_values_id = '" . (int)$attribute['value_id'] . "' and pa.options_values_id = poval.products_options_values_id and popt.language_id = '" . (int)$languages_id . "' and poval.language_id = '" . (int)$languages_id . "'");
+              }
+              $attributes_values = tep_db_fetch_array($attributes);
+              $products_ordered_attributes .= "\n\t" . $attributes_values['products_options_name'] . ' ' . $attributes_values['products_options_values_name'];
+            }
+          }
+          //------insert customer chosen option eof ----
+          $products_ordered .= $product['qty'] . ' x ' . $product['name'] . (empty($product['model']) ? '' : ' (' . $product['model'] . ')') . ' = ' . $GLOBALS['currencies']->display_price($product['final_price'], $product['tax'], $product['qty']) . $products_ordered_attributes . "\n";
+        }
+
+        // let's start with the email confirmation
+        global $order_id, $customer_id, $billto, $sendto;
+        $email_order = STORE_NAME . "\n"
+          . EMAIL_SEPARATOR . "\n"
+          . EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n"
+          . EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n"
+          . EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
+        if ($subject->info['comments']) {
+          $email_order .= tep_db_output($subject->info['comments']) . "\n\n";
+        }
+        $email_order .= EMAIL_TEXT_PRODUCTS . "\n"
+            . EMAIL_SEPARATOR . "\n"
+            . $products_ordered
+            . EMAIL_SEPARATOR . "\n";
+
+        foreach ($GLOBAL['order_totals'] as $order_total) {
+          $email_order .= strip_tags($order_total['title']) . ' ' . strip_tags($order_total['text']) . "\n";
+        }
+
+        if ($subject->content_type != 'virtual') {
+          $email_order .= "\n" . EMAIL_TEXT_DELIVERY_ADDRESS . "\n"
+                . EMAIL_SEPARATOR . "\n"
+                . tep_address_label($customer_id, $sendto, 0, '', "\n") . "\n";
+        }
+
+        $email_order .= "\n" . EMAIL_TEXT_BILLING_ADDRESS . "\n"
+                . EMAIL_SEPARATOR . "\n"
+                . tep_address_label($customer_id, $billto, 0, '', "\n") . "\n\n";
+        $payment_class = $GLOBALS[$GLOBALS['payment']];
+        if (is_object($payment_class)) {
+          $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n"
+              . EMAIL_SEPARATOR . "\n";
+          $email_order .= $subject->info['payment_method'] . "\n\n";
+          if (isset($payment_class->email_footer)) {
+            $email_order .= $payment_class->email_footer . "\n\n";
+          }
+        }
+
+        tep_mail($subject->customer['name'], $subject->customer['email_address'], EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
+
+        // send emails to other people
+        if (SEND_EXTRA_ORDER_EMAILS_TO != '') {
+          tep_mail('', SEND_EXTRA_ORDER_EMAILS_TO, EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
+        }
+        break;
+    }
+  }
+
 ////
 // Check if product has attributes
   function tep_has_product_attributes($products_id) {
@@ -1342,4 +1461,21 @@
 // nl2br() prior PHP 4.2.0 did not convert linefeeds on all OSs (it only converted \n)
   function tep_convert_linefeeds($from, $to, $string) {
     return str_replace($from, $to, $string);
+  }
+
+  function tep_delete_order($order_id) {
+    tep_db_query('DELETE FROM orders WHERE orders_id = ' . (int)$order_id);
+    tep_db_query('DELETE FROM orders_total WHERE orders_id = ' . (int)$order_id);
+    tep_db_query('DELETE FROM orders_status_history WHERE orders_id = ' . (int)$order_id);
+    tep_db_query('DELETE FROM orders_products WHERE orders_id = ' . (int)$order_id);
+    tep_db_query('DELETE FROM orders_products_attributes WHERE orders_id = ' . (int)$order_id);
+    tep_db_query('DELETE FROM orders_products_download WHERE orders_id = ' . (int)$order_id);
+  }
+
+  function tep_validate_form_action_is($action) {
+    $requested_action = $_GET['action'] ?? $_POST['action'];
+    return (isset($requested_action)
+      && ($requested_action == $action)
+      && isset($_POST['formid'])
+      && ($_POST['formid'] == $GLOBALS['sessiontoken']));
   }
