@@ -5,13 +5,26 @@
   osCommerce, Open Source E-Commerce Solutions
   http://www.oscommerce.com
 
-  Copyright (c) 2014 osCommerce
+  Copyright (c) 2019 osCommerce
 
   Released under the GNU General Public License
 */
 
   class authorizenet_cc_sim {
-    var $code, $title, $description, $enabled;
+
+    const REQUIRES = [
+      'firstname',
+      'lastname',
+      'street_address',
+      'city',
+      'postcode',
+      'country',
+      'telephone',
+      'email_address',
+    ];
+
+    public $code = 'authorizenet_cc_sim';
+    public $title, $description, $enabled;
 
     function __construct() {
       global $order;
@@ -19,7 +32,6 @@
       $this->signature = 'authorizenet|authorizenet_cc_sim|2.0|2.3';
       $this->api_version = '3.1';
 
-      $this->code = 'authorizenet_cc_sim';
       $this->title = MODULE_PAYMENT_AUTHORIZENET_CC_SIM_TEXT_TITLE;
       $this->public_title = MODULE_PAYMENT_AUTHORIZENET_CC_SIM_TEXT_PUBLIC_TITLE;
       $this->description = MODULE_PAYMENT_AUTHORIZENET_CC_SIM_TEXT_DESCRIPTION;
@@ -225,7 +237,7 @@
     }
 
     function after_process() {
-      global $insert_id;
+      global $order_id;
 
       $response = array('Response: ' . tep_db_prepare_input($_POST['x_response_reason_text']) . ' (' . tep_db_prepare_input($_POST['x_response_reason_code']) . ')',
                         'Transaction ID: ' . tep_db_prepare_input($_POST['x_trans_id']));
@@ -266,7 +278,7 @@
 
       $response[] = 'Card Holder: ' . tep_db_prepare_input($cavv_response);
 
-      $sql_data_array = array('orders_id' => $insert_id,
+      $sql_data_array = array('orders_id' => $order_id,
                               'orders_status_id' => MODULE_PAYMENT_AUTHORIZENET_CC_SIM_TRANSACTION_ORDER_STATUS_ID,
                               'date_added' => 'now()',
                               'customer_notified' => '0',
@@ -275,16 +287,7 @@
       tep_db_perform('orders_status_history', $sql_data_array);
 
       if ( ENABLE_SSL != true ) {
-        global $cart;
-
-        $cart->reset(true);
-
-// unregister session variables used during checkout
-        tep_session_unregister('sendto');
-        tep_session_unregister('billto');
-        tep_session_unregister('shipping');
-        tep_session_unregister('payment');
-        tep_session_unregister('comments');
+        require 'includes/modules/checkout/reset.php';
 
         $redirect_url = tep_href_link('checkout_success.php', '', 'SSL');
 
