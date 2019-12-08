@@ -49,6 +49,9 @@
     define('DIR_WS_CATALOG', DIR_WS_HTTPS_CATALOG);
   }
 
+// autoload classes in the classes or modules directories
+  require 'includes/functions/autoloader.php';
+
 // include the database functions
   require('includes/functions/database.php');
 
