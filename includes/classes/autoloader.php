@@ -69,5 +69,3 @@
       require $class_files[$class];
     }
   }
-
-  spl_autoload_register('tep_autoload_catalog');
