@@ -21,7 +21,7 @@ class hook_shop_siteWide_fontAwesome {
 
   function listen_injectSiteStart() {
     $this->sitestart .= '<!-- fa hooked -->' . PHP_EOL;
-    $this->sitestart .= '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" crossorigin="anonymous">' . PHP_EOL;
+    $this->sitestart .= '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" crossorigin="anonymous">' . PHP_EOL;
 
     return $this->sitestart;
   }
