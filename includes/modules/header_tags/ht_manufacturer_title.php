@@ -32,7 +32,7 @@
       global $PHP_SELF, $oscTemplate, $manufacturers, $languages_id, $brand;
       
       if (basename($PHP_SELF) == 'index.php') {
-        if (isset($_GET['manufacturers_id']) && is_numeric($_GET['manufacturers_id'])) {
+        if (isset($brand) && ($brand instanceof manufacturer)) {
           $brand_seo_title = $brand->getData('manufacturers_seo_title');
           $brand_name      = $brand->getData('manufacturers_name');
           
