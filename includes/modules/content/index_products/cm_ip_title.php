@@ -41,7 +41,7 @@
       
       $content_width = MODULE_CONTENT_IP_TITLE_CONTENT_WIDTH;
      
-      if (isset($_GET['manufacturers_id']) && !empty($_GET['manufacturers_id'])) {
+      if (isset($brand) && ($brand instanceof manufacturer)) {
         $cm_name  = $brand->getData('manufacturers_name');
         $cm_image = $brand->getData('manufacturers_image');
       } else {
