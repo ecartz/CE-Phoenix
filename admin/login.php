@@ -15,7 +15,7 @@
   require('includes/application_top.php');
   require('includes/functions/password_funcs.php');
 
-  $action = (isset($_GET['action']) ? $_GET['action'] : '');
+  $action = $_GET['action'] ?? '';
 
 // prepare to logout an active administrator if the login page is accessed again
   if (tep_session_is_registered('admin')) {
@@ -134,9 +134,9 @@
   
 ?>
 
-  <div class="col d-flex justify-content-center">
+  <div class="mx-auto w-75 w-md-25">
     <div class="card text-center shadow mt-5">
-      <div class="card-header"><?php echo HEADING_TITLE; ?></div>
+      <div class="card-header text-white bg-dark"><?php echo HEADING_TITLE; ?></div>
       <div class="px-5 py-2">
         <?php echo tep_image('images/CE-Phoenix.png', 'OSCOM CE Phoenix',  null, null, 'class="card-img-top"'); ?>
       </div>
@@ -155,7 +155,7 @@
         
       <ul class="list-group list-group-flush">
         <li class="list-group-item border-top"><?php echo tep_draw_input_field('username', null, 'required aria-required="true" class="form-control text-muted border-0 text-muted" placeholder="' . TEXT_USERNAME . '"'); ?></li>
-        <li class="list-group-item"><?php echo tep_draw_input_field('password', null, 'required aria-required="true" class="form-control text-muted border-0 text-muted" placeholder="' . TEXT_PASSWORD . '"'); ?></li>
+        <li class="list-group-item"><?php echo tep_draw_input_field('password', null, 'required aria-required="true" class="form-control text-muted border-0 text-muted" placeholder="' . TEXT_PASSWORD . '"', null, 'password'); ?></li>
         <li class="list-group-item border-bottom-0"><?php echo tep_draw_bootstrap_button($button_text, 'fas fa-key', null, null, null, 'btn-success btn-block'); ?></li>
       </ul>
       <?php 
