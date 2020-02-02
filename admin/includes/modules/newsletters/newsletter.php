@@ -52,7 +52,7 @@
       $mail_query = tep_db_query("select customers_firstname, customers_lastname, customers_email_address from customers where customers_newsletter = '1'");
 
       $mimemessage = new email();
-      $message->add_message($this->content);
+      $mimemessage->add_message($this->content);
       $mimemessage->build_message();
       while ($mail = tep_db_fetch_array($mail_query)) {
         $mimemessage->send($mail['customers_firstname'] . ' ' . $mail['customers_lastname'], $mail['customers_email_address'], '', EMAIL_FROM, $this->title);
