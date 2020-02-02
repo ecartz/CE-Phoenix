@@ -38,7 +38,7 @@
 
     //Let's build a message object using the email class
     $mimemessage = new email();
-    $message->add_message($message);
+    $mimemessage->add_message($message);
     $mimemessage->build_message();
     while ($mail = tep_db_fetch_array($mail_query)) {
       $mimemessage->send($mail['customers_firstname'] . ' ' . $mail['customers_lastname'], $mail['customers_email_address'], '', $from, $subject);
