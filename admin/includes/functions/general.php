@@ -201,7 +201,7 @@
     }
 
     $select_string = '<select name="' . $name . '"';
-    
+
     if (tep_not_null($parameters)) $select_string .= " $parameters";
     if (tep_not_null($class)) $select_string .= " $class";
 
@@ -840,6 +840,17 @@ EOSQL
     return $string;
   }
 
+  function tep_cfg_select_template($key_value, $key = null) {
+    $templates = [];
+    foreach (scandir(DIR_FS_CATALOG . 'templates', SCANDIR_SORT_ASCENDING) as $template) {
+      if ('.' !== $template[0]) {
+        $templates[] = $template;
+      }
+    }
+
+    return tep_cfg_select_option($templates, $key_value, $key);
+  }
+
 ////
 // Retrieve server information
   function tep_get_system_information() {
@@ -1418,10 +1429,10 @@ EOSQL
     global $languages_id;
 
     $select_string = '<select name="' . $name . '"';
-    
+
     if (tep_not_null($parameters)) $select_string .= " $parameters";
     if (tep_not_null($class)) $select_string .= " $class";
-    
+
     $select_string .= '>';
 
     $select_string .= '<option value="">--- ' . IMAGE_SELECT . ' ---</option>';
@@ -1456,10 +1467,10 @@ EOSQL
 
   function tep_draw_customers($name, $parameters = '', $selected = '', $class = 'class="form-control"') {
     $select_string = '<select name="' . $name . '"';
-    
+
     if (tep_not_null($parameters)) $select_string .= " $parameters";
     if (tep_not_null($class)) $select_string .= " $class";
-    
+
     $select_string .= '>';
     $select_string .= '<option value="">--- ' . IMAGE_SELECT . ' ---</option>';
 

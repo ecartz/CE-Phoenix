@@ -306,7 +306,7 @@
   require 'includes/functions/specials.php';
   tep_expire_specials();
 
-  $oscTemplate = new oscTemplate();
+  $oscTemplate = new oscTemplate(TEMPLATE_SELECTION);
 
 // calculate category path
   if (isset($_GET['cPath'])) {

@@ -14,21 +14,6 @@
 
   require "includes/languages/$language/create_account_success.php";
 
-  $breadcrumb->add(NAVBAR_TITLE_1);
-  $breadcrumb->add(NAVBAR_TITLE_2);
+  require $oscTemplate->map_to_template(__FILE__, 'page');
 
-  $page_content = $oscTemplate->getContent('create_account_success');
-
-  require 'includes/template_top.php';
-?>
-
-<div class="contentContainer">
-  <div class="row">
-    <?php echo $page_content; ?>
-  </div>
-</div>
-
-<?php
-  require 'includes/template_bottom.php';
   require 'includes/application_bottom.php';
-?>
