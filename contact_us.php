@@ -14,7 +14,7 @@
 
   require "includes/languages/$language/contact_us.php";
 
-  if (tep_validate_form_submission_is('send')) {
+  if (tep_validate_form_action_is('send')) {
     $error = false;
 
     $name = tep_db_prepare_input($_POST['name']);
@@ -42,12 +42,7 @@
       if (!defined('EMAIL_FROM')) {
         define('EMAIL_FROM', STORE_OWNER_EMAIL_ADDRESS);
       }
-      $parameters = [
-        'name' => $name,
-        'email_address' => $email_address,
-        'body' => $enquiry,
-      ];
-      //tep_notify('contact_us', $parameters);
+
       tep_mail(STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS, sprintf(EMAIL_SUBJECT, STORE_NAME), $enquiry, $name, $email_address);
 
       $actionRecorder->record();
