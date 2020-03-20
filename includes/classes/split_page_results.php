@@ -36,15 +36,15 @@
       $pos_from = stripos($this->sql_query, ' FROM', 0);
 
       $pos_group_by = stripos($this->sql_query, ' GROUP BY', $pos_from);
-      if (($pos_group_by < $pos_to) && ($pos_group_by != false)) $pos_to = $pos_group_by;
+      if ($pos_group_by && ($pos_group_by < $pos_to)) $pos_to = $pos_group_by;
 
       $pos_having = stripos($this->sql_query, ' HAVING', $pos_from);
-      if (($pos_having < $pos_to) && ($pos_having != false)) $pos_to = $pos_having;
+      if ($pos_having && ($pos_having < $pos_to)) $pos_to = $pos_having;
 
       $pos_order_by = stripos($this->sql_query, ' ORDER BY', $pos_from);
-      if (($pos_order_by < $pos_to) && ($pos_order_by != false)) $pos_to = $pos_order_by;
+      if ($pos_order_by && ($pos_order_by < $pos_to)) $pos_to = $pos_order_by;
 
-      if (stripos($this->sql_query, 'distinct') || stripos($this->sql_query, 'group by')) {
+      if (stripos($this->sql_query, 'DISTINCT') || stripos($this->sql_query, 'GROUP BY')) {
         $count_string = 'DISTINCT ' . tep_db_input($count_key);
       } else {
         $count_string = tep_db_input($count_key);
