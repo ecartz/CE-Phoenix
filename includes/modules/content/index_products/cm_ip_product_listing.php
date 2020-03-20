@@ -27,7 +27,7 @@ SELECT p.*, pd.*, m.*,
   IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
   p.products_quantity AS in_stock,
   IF(s.status, 1, 0) AS is_special
-FROM
+ FROM
   products p
     LEFT JOIN specials s ON p.products_id = s.products_id
     INNER JOIN products_description pd ON p.products_id = pd.products_id
@@ -41,7 +41,7 @@ EOSQL;
           $listing_sql .= <<<'EOSQL'
     INNER JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
     INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
-  WHERE p.products_status = 1 AND m.manufacturers_id = 
+ WHERE p.products_status = 1 AND m.manufacturers_id = 
 EOSQL
           . (int)$_GET['filter_id'] . " AND pd.language_id = " . (int)$languages_id . " AND p2c.categories_id = " . (int)$current_category_id;
         } else {
