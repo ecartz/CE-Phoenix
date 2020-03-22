@@ -135,9 +135,9 @@
     protected function _map_to_template($file, $type) {
       switch ($type) {
         case 'page':
-          return DIR_FS_CATALOG . 'templates/' . $this->_template->get_name() . '/includes/pages/' . basename($file);
+          return DIR_FS_CATALOG . 'templates/default/includes/pages/' . basename($file);
         case 'component':
-          return DIR_FS_CATALOG . 'templates/' . $this->_template->get_name() . '/includes/components/' . basename($file);
+          return DIR_FS_CATALOG . 'templates/default/includes/components/' . basename($file);
         case 'module':
           return dirname($file) . '/templates/tpl_' . basename($file);
         default:
