@@ -21,7 +21,7 @@
     protected $_template_mapping = [
     ];
 
-    protected function _get_template_mapping_for($file, $type) {
+    protected static function _get_template_mapping_for($file, $type) {
       switch ($type) {
         case 'page':
           return DIR_FS_CATALOG . 'templates/default/includes/pages/' . basename($file);
@@ -33,7 +33,8 @@
             $file = substr($file, strlen($prefix));
           }
           $file = dirname($file) . '/tpl_' . basename($file);
-          return DIR_FS_CATALOG . "templates/default/includes/modules/$file";
+          $path = DIR_FS_CATALOG . "templates/default/includes/modules/$file";
+          return file_exists($path) ? $path : DIR_FS_CATALOG . "includes/modules/$file";
         case 'literal':
         default:
           return DIR_FS_CATALOG . "templates/default/$file";
@@ -42,7 +43,7 @@
 
     public function get_template_mapping_for($file, $type) {
       $template_file = $this->_template_mapping[$file]
-                    ?? $this->_get_template_mapping_for($file, $type);
+                    ?? static::_get_template_mapping_for($file, $type);
 
       return file_exists($template_file) ? $template_file : null;
     }
