@@ -28,13 +28,7 @@
         case 'component':
           return DIR_FS_CATALOG . 'templates/default/includes/components/' . basename($file);
         case 'module':
-          $prefix = DIR_FS_CATALOG . 'includes/modules/';
-          if (substr($file, 0, strlen($prefix)) === $prefix) {
-            $file = substr($file, strlen($prefix));
-          }
-          $file = dirname($file) . '/tpl_' . basename($file);
-          $path = DIR_FS_CATALOG . "templates/default/includes/modules/$file";
-          return file_exists($path) ? $path : DIR_FS_CATALOG . "includes/modules/$file";
+          return dirname($file) . '/templates/tpl_' . basename($file);
         case 'literal':
         default:
           return DIR_FS_CATALOG . "templates/default/$file";
