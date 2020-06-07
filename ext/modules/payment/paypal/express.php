@@ -22,7 +22,7 @@
     tep_redirect(tep_href_link('shopping_cart.php', '', 'SSL'));
   }
 
-  require DIR_FS_CATALOG . "includes/languages/$language/create_account.php";
+  require DIR_FS_CATALOG . "includes/languages/$language/register.php";
 
   if ( !isset($_SESSION['sendto']) ) {
     if ( isset($_SESSION['customer_id']) ) {

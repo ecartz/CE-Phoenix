@@ -34,7 +34,7 @@
 
         tep_db_query("UPDATE customers_info SET password_reset_key = '" . tep_db_input($reset_key) . "', password_reset_date = NOW() WHERE customers_info_id = " . (int)$check_customer['id']);
 
-        $reset_key_url = tep_href_link('password_reset.php', 'account=' . urlencode($email_address) . '&key=' . $reset_key, 'SSL', false);
+        $reset_key_url = tep_href_link('password_reset.php', 'customer=' . urlencode($email_address) . '&key=' . $reset_key, 'SSL', false);
 
         if ( strpos($reset_key_url, '&amp;') !== false ) {
           $reset_key_url = str_replace('&amp;', '&', $reset_key_url);

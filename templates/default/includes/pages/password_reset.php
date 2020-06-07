@@ -22,7 +22,7 @@
     echo $messageStack->output('password_reset');
   }
 
-  echo tep_draw_form('password_reset', tep_href_link('password_reset.php', 'account=' . urlencode($email_address) . '&key=' . $password_key . '&action=process', 'SSL'), 'post', '', true);
+  echo tep_draw_form('password_reset', tep_href_link('password_reset.php', 'customer=' . urlencode($email_address) . '&key=' . $password_key . '&action=process', 'SSL'), 'post', '', true);
 ?>
 <div class="contentContainer">
   <div class="alert alert-info" role="alert"><?php echo TEXT_MAIN; ?></div>

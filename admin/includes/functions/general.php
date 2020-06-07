@@ -1449,12 +1449,12 @@ EOSQL
 
   function tep_draw_account_edit_pages($key_values, $key_name = null) {
     $pages = [
-      'account_edit',
-      'account_newsletters',
-      'account_password',
+      'customer_edit',
+      'newsletter_subscriptions',
+      'customer_password',
       'address_book',
       'checkout_new_address',
-      'create_account',
+      'register',
       'customers',
     ];
 

@@ -23,8 +23,8 @@
 
   $error = false;
 
-  if (isset($_GET['account']) && isset($_GET['key'])) {
-    $email_address = tep_db_prepare_input($_GET['account']);
+  if (isset($_GET['customer']) && isset($_GET['key'])) {
+    $email_address = tep_db_prepare_input($_GET['customer']);
     $password_key = tep_db_prepare_input($_GET['key']);
 
     if ( (strlen($email_address) < ENTRY_EMAIL_ADDRESS_MIN_LENGTH) || !tep_validate_email($email_address) ) {

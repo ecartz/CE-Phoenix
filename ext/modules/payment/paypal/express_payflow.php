@@ -23,7 +23,7 @@
     $customer_id = 0;
   }
 
-  require "includes/languages/$language/create_account.php";
+  require "includes/languages/$language/register.php";
 
   $paypal_pro_payflow_ec = new paypal_pro_payflow_ec();
 

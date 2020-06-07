@@ -10,11 +10,11 @@
   Released under the GNU General Public License
 */
 
-  class n_create_account extends abstract_module {
+  class n_register extends abstract_module {
 
     const CONFIG_KEY_BASE = 'MODULE_NOTIFICATIONS_CREATE_ACCOUNT_';
 
-    const TRIGGERS = [ 'create_account' ];
+    const TRIGGERS = [ 'register' ];
     const REQUIRES = [ 'greeting', 'name', 'email_address' ];
 
     public function notify($customer) {

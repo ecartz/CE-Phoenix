@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  if (strstr($PHP_SELF, 'account_history_info.php')) {
+  if (strstr($PHP_SELF, 'order_info.php')) {
     $last_order = $_GET['order_id'];
   } else {
 // Get last order id for checkout_success
@@ -22,7 +22,7 @@
 // Now get all downloadable products in that order
   $downloads_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT
-    date_format(o.date_purchased, '%%Y-%%m-%%d') AS date_purchased_day,
+    DATE_FORMAT(o.date_purchased, '%%Y-%%m-%%d') AS date_purchased_day,
     opd.download_maxdays,
     op.products_name,
     opd.orders_products_download_id,
@@ -77,10 +77,10 @@ EOSQL
     </table>
 
 <?php
-    if (!strstr($PHP_SELF, 'account_history_info.php')) {
+    if (!strstr($PHP_SELF, 'order_info.php')) {
 ?>
 
-    <p><?php printf(FOOTER_DOWNLOAD, '<a href="' . tep_href_link('account.php', '', 'SSL') . '">' . HEADER_TITLE_MY_ACCOUNT . '</a>'); ?></p>
+    <p><?php printf(FOOTER_DOWNLOAD, '<a href="' . tep_href_link('customer.php', '', 'SSL') . '">' . HEADER_TITLE_MY_ACCOUNT . '</a>'); ?></p>
 
 <?php
     }

@@ -15,7 +15,7 @@
      . MODULE_NOTIFICATIONS_CHECKOUT_SEPARATOR . "\n"
      . MODULE_NOTIFICATIONS_CHECKOUT_TEXT_ORDER_NUMBER . ' ' . $order->get_id() . "\n"
      . MODULE_NOTIFICATIONS_CHECKOUT_TEXT_INVOICE_URL . ' '
-     . tep_href_link('account_history_info.php', 'order_id=' . $order->get_id(), 'SSL', false) . "\n"
+     . tep_href_link('order_info.php', 'order_id=' . $order->get_id(), 'SSL', false) . "\n"
      . MODULE_NOTIFICATIONS_CHECKOUT_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
 
   if ($order->info['comments']) {

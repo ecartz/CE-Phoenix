@@ -20,10 +20,10 @@
   }
 
 // needs to be included earlier to set the success message in the messageStack
-  require "includes/languages/$language/account_password.php";
+  require "includes/languages/$language/customer_password.php";
 
   $page_fields = [ 'password', 'password_confirmation' ];
-  $message_stack_area = 'account_password';
+  $message_stack_area = 'customer_password';
 
   if (tep_validate_form_action_is('process')) {
     $password_current = tep_db_prepare_input($_POST['password_current']);
@@ -39,9 +39,9 @@
 
         tep_db_query("UPDATE customers_info SET customers_info_date_account_last_modified = NOW() WHERE customers_info_id = " . (int)$_SESSION['customer_id']);
 
-        $messageStack->add_session('account', SUCCESS_PASSWORD_UPDATED, 'success');
+        $messageStack->add_session('customer', SUCCESS_PASSWORD_UPDATED, 'success');
 
-        tep_redirect(tep_href_link('account.php', '', 'SSL'));
+        tep_redirect(tep_href_link('customer.php', '', 'SSL'));
       } else {
         $messageStack->add($message_stack_area, ERROR_CURRENT_PASSWORD_NOT_MATCHING);
       }
