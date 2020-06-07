@@ -25,7 +25,7 @@
     tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
-  $braintree_cards = new cm_account_braintree_cards();
+  $braintree_cards = new cm_customer_braintree_cards();
 
   if ( !$braintree_cards->isEnabled() ) {
     tep_redirect(tep_href_link('customer.php', '', 'SSL'));

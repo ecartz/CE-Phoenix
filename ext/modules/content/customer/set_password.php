@@ -34,7 +34,7 @@
   }
 
 // needs to be included earlier to set the success message in the messageStack
-  require "includes/languages/$language/modules/content/customer/cm_account_set_password.php";
+  require "includes/languages/$language/modules/content/customer/cm_customer_set_password.php";
 
   $page_fields = ['password', 'password_confirmation'];
 

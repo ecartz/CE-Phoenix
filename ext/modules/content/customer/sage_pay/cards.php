@@ -25,7 +25,7 @@
     tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
-  $sage_pay_cards = new cm_account_sage_pay_cards();
+  $sage_pay_cards = new cm_customer_sage_pay_cards();
 
   if ( !$sage_pay_cards->isEnabled() ) {
     tep_redirect(tep_href_link('customer.php', '', 'SSL'));
