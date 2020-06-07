@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  class cm_account_braintree_cards {
+  class cm_customer_braintree_cards {
     var $code;
     var $group;
     var $title;
@@ -65,7 +65,7 @@
       global $oscTemplate;
 
       $oscTemplate->_data['customer']['customer']['links']['braintree_cards'] = array('title' => $this->public_title,
-                                                                                    'link' => tep_href_link('ext/modules/content/account/braintree/cards.php', '', 'SSL'),
+                                                                                    'link' => tep_href_link('ext/modules/content/customer/braintree/cards.php', '', 'SSL'),
                                                                                     'icon' => 'far fa-credit-card fa-5x');
     }
 

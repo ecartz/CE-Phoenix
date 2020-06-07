@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  class cm_account_set_password extends abstract_executable_module {
+  class cm_customer_set_password extends abstract_executable_module {
 
     const REQUIRES = [ 'password' ];
 
@@ -41,7 +41,7 @@
           $links += [
             'set_password' => [
               'title' => MODULE_CONTENT_ACCOUNT_SET_PASSWORD_SET_PASSWORD_LINK_TITLE,
-              'link' => tep_href_link('ext/modules/content/account/set_password.php', '', 'SSL'),
+              'link' => tep_href_link('ext/modules/content/customer/set_password.php', '', 'SSL'),
               'icon' => 'fas fa-lock fa-5x',
             ],
           ];

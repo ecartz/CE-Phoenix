@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  class cm_account_sage_pay_cards {
+  class cm_customer_sage_pay_cards {
     var $code;
     var $group;
     var $title;
@@ -65,7 +65,7 @@
       global $oscTemplate;
 
       $oscTemplate->_data['customer']['customer']['links']['sage_pay_cards'] = array('title' => $this->public_title,
-                                                                                   'link' => tep_href_link('ext/modules/content/account/sage_pay/cards.php', '', 'SSL'),
+                                                                                   'link' => tep_href_link('ext/modules/content/customer/sage_pay/cards.php', '', 'SSL'),
                                                                                    'icon' => 'far fa-credit-card fa-5x');
     }
 

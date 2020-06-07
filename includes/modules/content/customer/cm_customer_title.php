@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  class cm_account_title extends abstract_executable_module {
+  class cm_customer_title extends abstract_executable_module {
 
     const CONFIG_KEY_BASE = 'MODULE_CONTENT_ACCOUNT_TITLE_';
 

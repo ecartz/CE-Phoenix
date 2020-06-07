@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  class cm_account_gdpr {
+  class cm_customer_gdpr {
     var $code;
     var $group;
     var $title;
