@@ -15,7 +15,7 @@
   $OSCOM_Hooks->register_pipeline('loginRequired');
 
   if (!is_numeric($_GET['order_id'] ?? null)) {
-    tep_redirect(tep_href_link('account_history.php', '', 'SSL'));
+    tep_redirect(tep_href_link('order_history.php', '', 'SSL'));
   }
 
   $customer_info_query = tep_db_query(sprintf(<<<'EOSQL'
@@ -26,10 +26,10 @@ EOSQL
     , (int)$_GET['order_id'], (int)$_SESSION['languages_id']));
   $customer_info = tep_db_fetch_array($customer_info_query);
   if ($customer_info['customers_id'] != $_SESSION['customer_id']) {
-    tep_redirect(tep_href_link('account_history.php', '', 'SSL'));
+    tep_redirect(tep_href_link('order_history.php', '', 'SSL'));
   }
 
-  require "includes/languages/$language/account_history_info.php";
+  require "includes/languages/$language/order_info.php";
 
   $order = new order($_GET['order_id']);
 

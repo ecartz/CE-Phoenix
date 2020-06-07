@@ -13,7 +13,7 @@
   $breadcrumb->add(NAVBAR_TITLE_1);
   $breadcrumb->add(NAVBAR_TITLE_2);
 
-  $page_content = $oscTemplate->getContent('create_account_success');
+  $page_content = $oscTemplate->getContent('registration_success');
 
   require $oscTemplate->map_to_template('template_top.php', 'component');
 ?>

@@ -10,7 +10,7 @@
   Released under the GNU General Public License
 */
 
-  $breadcrumb->add(NAVBAR_TITLE, tep_href_link('create_account.php', '', 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE, tep_href_link('register.php', '', 'SSL'));
 
   require $oscTemplate->map_to_template('template_top.php', 'component');
 ?>
@@ -30,7 +30,7 @@
   </div>
 </div>
 
-<?php echo tep_draw_form('create_account', tep_href_link('create_account.php', '', 'SSL'), 'post', '', true) . tep_draw_hidden_field('action', 'process'); ?>
+<?php echo tep_draw_form('register', tep_href_link('register.php', '', 'SSL'), 'post', '', true) . tep_draw_hidden_field('action', 'process'); ?>
 
 <div class="contentContainer">
   <?php

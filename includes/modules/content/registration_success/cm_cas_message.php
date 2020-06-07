@@ -38,7 +38,7 @@
       $content_width = (int)MODULE_CONTENT_CAS_MESSAGE_CONTENT_WIDTH;
       
       $contact_us_href = tep_href_link('contact_us.php', '', 'SSL');
-      $account_href = tep_href_link('account.php', '', 'SSL');
+      $account_href = tep_href_link('customer.php', '', 'SSL');
       
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

@@ -14,7 +14,7 @@
 
   $OSCOM_Hooks->register_pipeline('loginRequired');
 
-  require "includes/languages/$language/account_history.php";
+  require "includes/languages/$language/order_history.php";
 
   require $oscTemplate->map_to_template(__FILE__, 'page');
 

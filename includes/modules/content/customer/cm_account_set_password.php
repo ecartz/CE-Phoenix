@@ -23,7 +23,7 @@
     function execute() {
       if ( isset($_SESSION['customer_id']) && ( MODULE_CONTENT_ACCOUNT_SET_PASSWORD_ALLOW_PASSWORD == 'True' ) ) {
         if ( empty($GLOBALS['customer']->get('password')) ) {
-          $links =& $GLOBALS['oscTemplate']->_data['account']['account']['links'];
+          $links =& $GLOBALS['oscTemplate']->_data['customer']['customer']['links'];
 
           $counter = 0;
           foreach ( array_keys($links) as $key ) {

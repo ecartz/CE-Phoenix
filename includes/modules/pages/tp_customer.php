@@ -10,9 +10,9 @@
   Released under the GNU General Public License
 */
 
-  class tp_account {
+  class tp_customer {
 
-    public $group = 'account';
+    public $group = 'customer';
 
     function prepare() {
       global $customer_data;
@@ -20,13 +20,13 @@
       $d = &$GLOBALS['oscTemplate']->_data[$this->group];
 
       $d = [
-        'account' => [
+        'customer' => [
           'title' => MY_ACCOUNT_TITLE,
           'sort_order' => 10,
           'links' => [
             'edit' => [
               'title' => MY_ACCOUNT_INFORMATION,
-              'link' => tep_href_link('account_edit.php', '', 'SSL'),
+              'link' => tep_href_link('customer_edit.php', '', 'SSL'),
               'icon' => 'fas fa-user fa-5x',
             ],
           ],
@@ -37,7 +37,7 @@
           'links' => [
             'history' => [
               'title' => MY_ORDERS_VIEW,
-              'link' => tep_href_link('account_history.php', '', 'SSL'),
+              'link' => tep_href_link('order_history.php', '', 'SSL'),
               'icon' => 'fas fa-shopping-cart fa-5x',
             ],
           ],
@@ -50,7 +50,7 @@
       ];
 
       if ($customer_data->has(['address'])) {
-        $d['account']['links']['address_book'] = [
+        $d['customer']['links']['address_book'] = [
           'title' => MY_ACCOUNT_ADDRESS_BOOK,
           'link' => tep_href_link('address_book.php', '', 'SSL'),
           'icon' => 'fas fa-home fa-5x',
@@ -58,9 +58,9 @@
       }
 
       if ($customer_data->has(['password'])) {
-        $d['account']['links']['password'] = [
+        $d['customer']['links']['password'] = [
           'title' => MY_ACCOUNT_PASSWORD,
-          'link' => tep_href_link('account_password.php', '', 'SSL'),
+          'link' => tep_href_link('customer_password.php', '', 'SSL'),
           'icon' => 'fas fa-cog fa-5x',
         ];
       }
@@ -68,14 +68,14 @@
       if ($customer_data->has(['newsletter'])) {
         $d['notifications']['links']['newsletters'] = [
           'title' => EMAIL_NOTIFICATIONS_NEWSLETTERS,
-          'link' => tep_href_link('account_newsletters.php', '', 'SSL'),
+          'link' => tep_href_link('newsletter_subscriptions.php', '', 'SSL'),
           'icon' => 'fas fa-envelope fa-5x',
         ];
       }
 
       $d['notifications']['links']['products'] = [
         'title' => EMAIL_NOTIFICATIONS_PRODUCTS,
-        'link' => tep_href_link('account_notifications.php', '', 'SSL'),
+        'link' => tep_href_link('product_notifications.php', '', 'SSL'),
         'icon' => 'fas fa-paper-plane fa-5x',
       ];
     }

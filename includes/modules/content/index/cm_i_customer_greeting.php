@@ -24,7 +24,7 @@
       if (isset($customer) && ($customer instanceof customer)) {
         $customer_greeting = sprintf(MODULE_CONTENT_CUSTOMER_GREETING_PERSONAL, htmlspecialchars($customer->get('short_name')), tep_href_link('products_new.php'));
       } else {
-        $customer_greeting = sprintf(MODULE_CONTENT_CUSTOMER_GREETING_GUEST, tep_href_link('login.php', '', 'SSL'), tep_href_link('create_account.php', '', 'SSL'));
+        $customer_greeting = sprintf(MODULE_CONTENT_CUSTOMER_GREETING_GUEST, tep_href_link('login.php', '', 'SSL'), tep_href_link('register.php', '', 'SSL'));
       }
 
       $content_width = MODULE_CONTENT_CUSTOMER_GREETING_CONTENT_WIDTH;

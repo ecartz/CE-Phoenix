@@ -41,7 +41,7 @@
       if (isset($_SESSION['customer_id'])) {
         $geo_location = $customer->get('countries_id');
 
-        $oscTemplate->_data['account']['gdpr'] = array('title' => $this->public_title,
+        $oscTemplate->_data['customer']['gdpr'] = array('title' => $this->public_title,
                                                        'sort_order' => 100,
                                                        'links' => array());
 
@@ -49,11 +49,11 @@
           $eu_countries = explode(';', MODULE_CONTENT_ACCOUNT_GDPR_COUNTRIES);
 
           if (in_array($geo_location, $eu_countries)) {
-            $oscTemplate->_data['account']['gdpr']['links'][$this->group] = array('title' => MODULE_CONTENT_ACCOUNT_GDPR_SUB_TITLE, 'link' => tep_href_link('gdpr.php', '', 'SSL'), 'icon' => 'fa fa-user-secret fa-5x');
+            $oscTemplate->_data['customer']['gdpr']['links'][$this->group] = array('title' => MODULE_CONTENT_ACCOUNT_GDPR_SUB_TITLE, 'link' => tep_href_link('gdpr.php', '', 'SSL'), 'icon' => 'fa fa-user-secret fa-5x');
           }
         }
         else {
-          $oscTemplate->_data['account']['gdpr']['links'][$this->group] = array('title' => MODULE_CONTENT_ACCOUNT_GDPR_SUB_TITLE, 'link' => tep_href_link('gdpr.php', '', 'SSL'), 'icon' => 'fa fa-user-secret fa-5x');
+          $oscTemplate->_data['customer']['gdpr']['links'][$this->group] = array('title' => MODULE_CONTENT_ACCOUNT_GDPR_SUB_TITLE, 'link' => tep_href_link('gdpr.php', '', 'SSL'), 'icon' => 'fa fa-user-secret fa-5x');
         }
       }
     }

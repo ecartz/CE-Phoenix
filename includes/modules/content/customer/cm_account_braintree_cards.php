@@ -64,7 +64,7 @@
     function execute() {
       global $oscTemplate;
 
-      $oscTemplate->_data['account']['account']['links']['braintree_cards'] = array('title' => $this->public_title,
+      $oscTemplate->_data['customer']['customer']['links']['braintree_cards'] = array('title' => $this->public_title,
                                                                                     'link' => tep_href_link('ext/modules/content/account/braintree/cards.php', '', 'SSL'),
                                                                                     'icon' => 'far fa-credit-card fa-5x');
     }

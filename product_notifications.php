@@ -15,7 +15,7 @@
   $OSCOM_Hooks->register_pipeline('loginRequired');
 
 // needs to be included earlier to set the success message in the messageStack
-  require "includes/languages/$language/account_notifications.php";
+  require "includes/languages/$language/product_notifications.php";
 
   $global_query = tep_db_query("SELECT global_product_notifications FROM customers_info WHERE customers_info_id = " . (int)$_SESSION['customer_id']);
   $global = tep_db_fetch_array($global_query);
@@ -56,9 +56,9 @@
       }
     }
 
-    $messageStack->add_session('account', SUCCESS_NOTIFICATIONS_UPDATED, 'success');
+    $messageStack->add_session('customer', SUCCESS_NOTIFICATIONS_UPDATED, 'success');
 
-    tep_redirect(tep_href_link('account.php', '', 'SSL'));
+    tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
   require $oscTemplate->map_to_template(__FILE__, 'page');

@@ -10,17 +10,17 @@
   Released under the GNU General Public License
 */
 
-  $breadcrumb->add(NAVBAR_TITLE, tep_href_link('account.php', '', 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE, tep_href_link('customer.php', '', 'SSL'));
 
   require $oscTemplate->map_to_template('template_top.php', 'component');
 
-  if ($messageStack->size('account') > 0) {
-    echo $messageStack->output('account');
+  if ($messageStack->size('customer') > 0) {
+    echo $messageStack->output('customer');
   }
 ?>
 
 <div class="contentContainer">
-  <div class="row"><?php echo $oscTemplate->getContent('account'); ?></div>
+  <div class="row"><?php echo $oscTemplate->getContent('customer'); ?></div>
 </div>
 
 

@@ -10,9 +10,9 @@
   Released under the GNU General Public License
 */
 
-  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link('account.php', '', 'SSL'));
-  $breadcrumb->add(NAVBAR_TITLE_2, tep_href_link('account_history.php', '', 'SSL'));
-  $breadcrumb->add(sprintf(NAVBAR_TITLE_3, $_GET['order_id']), tep_href_link('account_history_info.php', 'order_id=' . $_GET['order_id'], 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link('customer.php', '', 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE_2, tep_href_link('order_history.php', '', 'SSL'));
+  $breadcrumb->add(sprintf(NAVBAR_TITLE_3, $_GET['order_id']), tep_href_link('order_info.php', 'order_id=' . $_GET['order_id'], 'SSL'));
 
   require $oscTemplate->map_to_template('template_top.php', 'component');
 ?>
@@ -121,11 +121,11 @@ EOSQL
     include $oscTemplate->map_to_template('downloads.php', 'component');
   }
 
-  echo $OSCOM_Hooks->call('account_history_info', 'orderDetails');
+  echo $OSCOM_Hooks->call('order_info', 'orderDetails');
 ?>
 
   <div class="buttonSet my-2">
-    <?php echo tep_draw_button(IMAGE_BUTTON_BACK, 'fas fa-angle-left', tep_href_link('account_history.php', tep_get_all_get_params(['order_id']), 'SSL'), null, null, 'btn-light'); ?>
+    <?php echo tep_draw_button(IMAGE_BUTTON_BACK, 'fas fa-angle-left', tep_href_link('order_history.php', tep_get_all_get_params(['order_id']), 'SSL'), null, null, 'btn-light'); ?>
   </div>
 
 </div>

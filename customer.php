@@ -14,7 +14,7 @@
 
   $OSCOM_Hooks->register_pipeline('loginRequired');
 
-  require "includes/languages/$language/account.php";
+  require "includes/languages/$language/customer.php";
 
   require $oscTemplate->map_to_template(__FILE__, 'page');
 

@@ -13,11 +13,11 @@
   require 'includes/application_top.php';
 
 // needs to be included earlier to set the success message in the messageStack
-  require "includes/languages/$language/create_account.php";
+  require "includes/languages/$language/register.php";
 
-  $message_stack_area = 'create_account';
+  $message_stack_area = 'register';
 
-  $page_fields = $customer_data->get_fields_for_page('create_account');
+  $page_fields = $customer_data->get_fields_for_page('register');
   $customer_details = null;
   if (tep_validate_form_action_is('process')) {
     $customer_details = $customer_data->process($page_fields);
@@ -41,9 +41,9 @@
       tep_reset_session_token();
       $_SESSION['cart']->restore_contents();
 
-      tep_notify('create_account', $customer);
+      tep_notify('register', $customer);
 
-      tep_redirect(tep_href_link('create_account_success.php', '', 'SSL'));
+      tep_redirect(tep_href_link('registration_success.php', '', 'SSL'));
     }
   }
 

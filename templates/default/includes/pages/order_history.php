@@ -10,8 +10,8 @@
   Released under the GNU General Public License
 */
 
-  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link('account.php', '', 'SSL'));
-  $breadcrumb->add(NAVBAR_TITLE_2, tep_href_link('account_history.php', '', 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE_1, tep_href_link('customer.php', '', 'SSL'));
+  $breadcrumb->add(NAVBAR_TITLE_2, tep_href_link('order_history.php', '', 'SSL'));
 
   require $oscTemplate->map_to_template('template_top.php', 'component');
 ?>
@@ -57,7 +57,7 @@ EOSQL
               <td><?php echo tep_date_short($history['date_purchased']); ?></td>
               <td class="d-none d-md-table-cell"><?php echo $products['count']; ?></td>
               <td><?php echo strip_tags($history['order_total']); ?></td>
-              <td class="text-right"><?php echo tep_draw_button(BUTTON_VIEW_ORDER, null, tep_href_link('account_history_info.php', tep_get_all_get_params(['order_id']) . 'order_id=' . (int)$history['orders_id'], 'SSL'), 'primary', NULL, 'btn-primary btn-sm'); ?></td>
+              <td class="text-right"><?php echo tep_draw_button(BUTTON_VIEW_ORDER, null, tep_href_link('order_info.php', tep_get_all_get_params(['order_id']) . 'order_id=' . (int)$history['orders_id'], 'SSL'), 'primary', NULL, 'btn-primary btn-sm'); ?></td>
             </tr>
             <?php
           }
@@ -88,7 +88,7 @@ EOSQL
 ?>
 
   <div class="buttonSet my-2">
-    <?php echo tep_draw_button(IMAGE_BUTTON_BACK, 'fas fa-angle-left', tep_href_link('account.php', '', 'SSL'), null, null, 'btn-light'); ?>
+    <?php echo tep_draw_button(IMAGE_BUTTON_BACK, 'fas fa-angle-left', tep_href_link('customer.php', '', 'SSL'), null, null, 'btn-light'); ?>
   </div>
 </div>
 
