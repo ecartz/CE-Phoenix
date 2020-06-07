@@ -19,16 +19,16 @@
     $sage_pay_direct = new sage_pay_direct();
 
     if ( !$sage_pay_direct->enabled ) {
-      tep_redirect(tep_href_link('account.php', '', 'SSL'));
+      tep_redirect(tep_href_link('customer.php', '', 'SSL'));
     }
   } else {
-    tep_redirect(tep_href_link('account.php', '', 'SSL'));
+    tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
   $sage_pay_cards = new cm_account_sage_pay_cards();
 
   if ( !$sage_pay_cards->isEnabled() ) {
-    tep_redirect(tep_href_link('account.php', '', 'SSL'));
+    tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
   if ( isset($_GET['action']) ) {
@@ -42,7 +42,7 @@
       }
     }
 
-    tep_redirect(tep_href_link('ext/modules/content/account/sage_pay/cards.php', '', 'SSL'));
+    tep_redirect(tep_href_link('ext/modules/content/customer/sage_pay/cards.php', '', 'SSL'));
   }
 
   require $oscTemplate->map_to_template(__FILE__, 'ext');

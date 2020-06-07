@@ -19,16 +19,16 @@
     $braintree_cc = new braintree_cc();
 
     if ( !$braintree_cc->enabled ) {
-      tep_redirect(tep_href_link('account.php', '', 'SSL'));
+      tep_redirect(tep_href_link('customer.php', '', 'SSL'));
     }
   } else {
-    tep_redirect(tep_href_link('account.php', '', 'SSL'));
+    tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
   $braintree_cards = new cm_account_braintree_cards();
 
   if ( !$braintree_cards->isEnabled() ) {
-    tep_redirect(tep_href_link('account.php', '', 'SSL'));
+    tep_redirect(tep_href_link('customer.php', '', 'SSL'));
   }
 
   if ( isset($_GET['action']) ) {
@@ -42,7 +42,7 @@
       }
     }
 
-    tep_redirect(tep_href_link('ext/modules/content/account/braintree/cards.php', '', 'SSL'));
+    tep_redirect(tep_href_link('ext/modules/content/customer/braintree/cards.php', '', 'SSL'));
   }
 
   require $oscTemplate->map_to_template(__FILE__, 'ext');
