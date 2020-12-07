@@ -24,22 +24,15 @@
       }
 
       tep_db_data_seek($random_query, tep_rand(0, ($num_rows - 1)));
-      $random_product = tep_db_fetch_array($random_query);
+      $random_selection = tep_db_fetch_array($random_query);
 
-      $product = product_by_id::build((int)$random_product['products_id']);
-
-      $data = [
-        'data-is-special' => $product->get('is_special'),
-        'data-product-price' => $product->format_raw('final_price'),
-        'data-product-manufacturer' => $product->get('manufacturers_id'),
-      ];
+      $product = product_by_id::build((int)$random_selection['products_id']);
 
       $box = [
         'parameters' => ['product_card.php', 'component'],
         'classes' => 'is-product bm-whats-new',
-        'attributes' => implode(array_map(function ($key, $value) {
-          return ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
-        }, array_keys($data), $data)),
+        'title' => sprintf(MODULE_BOXES_WHATS_NEW_BOX_TITLE, tep_href_link('products_new.php')),
+        'attributes' => $product->build_data_attributes(),
       ];
 
       $tpl_data = [

@@ -1,6 +1,3 @@
-  <div class="card-header">
-    <?php printf(MODULE_BOXES_WHATS_NEW_BOX_TITLE, tep_href_link('products_new.php')); ?>
-  </div>
   <a href="<?= $product->get('link') ?>"><?= tep_image('images/' . $product->get('image'), htmlspecialchars($product->get('name')), null, null, null, true, 'card-img-top') ?></a>
   <div class="card-body">
     <h5 class="card-title"><a href="<?= $product->get('link') ?>"><?= $product->get('name') ?></a></h5>

@@ -36,7 +36,6 @@ EOSQL
           $trimmed_key = tep_ltrim_once($key, 'products_');
           $product[isset($data[$trimmed_key]) ? $key : $trimmed_key] = $value; 
         }
-        $product['link'] = tep_href_link('product_info.php', 'products_id=' . (int)$product['id']);
 
         return new Product($product);
       }

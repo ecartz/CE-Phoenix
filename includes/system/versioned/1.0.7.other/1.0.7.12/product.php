@@ -8,10 +8,18 @@
 
   class Product {
 
-    protected $_data;
+    protected $_data = [];
 
     public function __construct($data = ['status' => 0]) {
-      $this->_data = $data;
+      foreach ($data as $key => $value) {
+        $trimmed_key = tep_ltrim_once($key, 'products_');
+
+        $this->_data[isset($data[$trimmed_key]) ? $key : $trimmed_key] = $value;
+      }
+
+      if (isset($this->_data['id']) && !isset($this->_data['link'])) {
+        $this->_data['link'] = tep_href_link('product_info.php', 'products_id=' . (int)$this->_data['id']);
+      }
     }
 
     public function has($key) {
@@ -32,6 +40,18 @@
 
     public function get_data() {
       return $this->_data;
+    }
+
+    public function build_data_attributes($data = []) {
+      $data['data-is-special'] = $this->get('is_special');
+      $data['data-product-price'] = $this->format_raw();
+      $data['data-product-manufacturer'] = $this->get('manufacturers_id');
+
+      $this->_data['data-attributes'] = implode(array_map(function ($key, $value) {
+        return ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
+      }, array_keys($data), $data));
+
+      return $this->_data['data-attributes'];
     }
 
     public function hype_price($show_special_price = true) {

@@ -1,4 +1,6 @@
 <div class="card mb-2 <?= $box['classes'] ?>"<?= $box['attributes'] ?? '' ?>>
+  <div class="card-header"><?= $box['title'] ?></div>
+
   <?php include $GLOBALS['oscTemplate']->map_to_template(...$box['parameters']) ?>
 </div>
 
