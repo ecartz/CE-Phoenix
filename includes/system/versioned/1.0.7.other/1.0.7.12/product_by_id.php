@@ -8,7 +8,7 @@
 
   class product_by_id {
 
-    public static function build($product_id) {
+    public static function build($product_id, $get_parameters = null) {
       if ( empty($product_id) ) {
         return new Product();
       }
@@ -30,14 +30,11 @@ EOSQL
         , (int)$product_id, (int)$_SESSION['languages_id']));
 
       if ($data = tep_db_fetch_array($product_query)) {
-        $product = [];
-
-        foreach ($data as $key => $value) {
-          $trimmed_key = tep_ltrim_once($key, 'products_');
-          $product[isset($data[$trimmed_key]) ? $key : $trimmed_key] = $value; 
+        if (!empty($get_parameters)) {
+          $data['link'] = Product::build_link($product_id, $get_parameters);
         }
 
-        return new Product($product);
+        return new Product($data);
       }
 
       return new Product(['status' => 0, 'id' => (int)$product_id]);

@@ -27,24 +27,33 @@
 
       $page = $_GET[$this->page_name] ?? $_POST[$this->page_name] ?? '';
 
-      if (empty($page) || !is_numeric($page)) $page = 1;
+      if (empty($page) || !is_numeric($page)) {
+        $page = 1;
+      }
       $this->current_page_number = $page;
 
       $this->number_of_rows_per_page = $max_rows;
 
       $pos_to = strlen($this->sql_query);
-      $pos_from = stripos($this->sql_query, ' FROM', 0);
+      $pos_from = stripos($this->sql_query, ' FROM');
+      $pos_where = strripos($this->sql_query, ' WHERE') ?: $pos_from;
 
-      $pos_group_by = stripos($this->sql_query, ' GROUP BY', $pos_from);
-      if (($pos_group_by < $pos_to) && ($pos_group_by != false)) $pos_to = $pos_group_by;
+      $pos_group_by = stripos($this->sql_query, ' GROUP BY', $pos_where);
+      if ($pos_group_by && ($pos_group_by < $pos_to)) {
+        $pos_to = $pos_group_by;
+      }
 
-      $pos_having = stripos($this->sql_query, ' HAVING', $pos_from);
-      if (($pos_having < $pos_to) && ($pos_having != false)) $pos_to = $pos_having;
+      $pos_having = stripos($this->sql_query, ' HAVING', $pos_where);
+      if ($pos_having && ($pos_having < $pos_to)) {
+        $pos_to = $pos_having;
+      }
 
-      $pos_order_by = stripos($this->sql_query, ' ORDER BY', $pos_from);
-      if (($pos_order_by < $pos_to) && ($pos_order_by != false)) $pos_to = $pos_order_by;
+      $pos_order_by = stripos($this->sql_query, ' ORDER BY', $pos_where);
+      if ($pos_order_by && ($pos_order_by < $pos_to)) {
+        $pos_to = $pos_order_by;
+      }
 
-      if (stripos($this->sql_query, 'distinct') || stripos($this->sql_query, 'group by')) {
+      if (stripos($this->sql_query, 'DISTINCT') || stripos($this->sql_query, 'GROUP BY', $pos_where)) {
         $count_string = 'DISTINCT ' . tep_db_input($count_key);
       } else {
         $count_string = tep_db_input($count_key);
@@ -70,7 +79,7 @@
 
 // display split-page-number-links
     public function display_links($max_page_links, $parameters = '') {
-      global $PHP_SELF, $request_type;
+      global $PHP_SELF;
 
       $display_links_string = '<nav aria-label="...">';
         $display_links_string .= '<ul class="pagination pagination-lg justify-content-end">';
@@ -82,7 +91,7 @@
 // previous button - not displayed on first page
         if ($this->current_page_number > 1) {
           $display_links_string .= '<li class="page-item">';
-            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . ($this->current_page_number - 1), $request_type) . '" title=" ' . PREVNEXT_TITLE_PREVIOUS_PAGE . ' "><i class="fas fa-angle-left"></i></a>';
+            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . ($this->current_page_number - 1)) . '" title=" ' . PREVNEXT_TITLE_PREVIOUS_PAGE . ' "><i class="fas fa-angle-left"></i></a>';
           $display_links_string .= '</li>';
         } else {
           $display_links_string .= '<li class="page-item disabled">';
@@ -104,7 +113,7 @@
 // previous window of pages
         if ($cur_window_num > 1) {
           $display_links_string .= '<li class="page-item">';
-            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . (($cur_window_num - 1) * $max_page_links), $request_type) . '" title=" ' . sprintf(PREVNEXT_TITLE_PREV_SET_OF_NO_PAGE, $max_page_links) . ' ">...</a>';
+            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . (($cur_window_num - 1) * $max_page_links)) . '" title=" ' . sprintf(PREVNEXT_TITLE_PREV_SET_OF_NO_PAGE, $max_page_links) . ' ">...</a>';
           $display_links_string .= '</li>';
         }
 
@@ -112,11 +121,11 @@
         for ($jump_to_page = 1 + (($cur_window_num - 1) * $max_page_links); ($jump_to_page <= ($cur_window_num * $max_page_links)) && ($jump_to_page <= $this->number_of_pages); $jump_to_page++) {
           if ($jump_to_page == $this->current_page_number) {
             $display_links_string .= '<li class="page-item active">';
-              $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . $jump_to_page, $request_type) . '" title=" ' . sprintf(PREVNEXT_TITLE_PAGE_NO, $jump_to_page) . ' ">' . $jump_to_page . '<span class="sr-only">(current)</span></a>';
+              $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . $jump_to_page) . '" title=" ' . sprintf(PREVNEXT_TITLE_PAGE_NO, $jump_to_page) . ' ">' . $jump_to_page . '<span class="sr-only">(current)</span></a>';
             $display_links_string .= '</li>';
           } else {
             $display_links_string .= '<li class="page-item">';
-              $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . $jump_to_page, $request_type) . '" title=" ' . sprintf(PREVNEXT_TITLE_PAGE_NO, $jump_to_page) . ' ">' . $jump_to_page . '</a>';
+              $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . $jump_to_page) . '" title=" ' . sprintf(PREVNEXT_TITLE_PAGE_NO, $jump_to_page) . ' ">' . $jump_to_page . '</a>';
             $display_links_string .= '</li>';
           }
         }
@@ -124,14 +133,14 @@
 // next window of pages
         if ($cur_window_num < $max_window_num) {
           $display_links_string .= '<li class="page-item">';
-            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . (($cur_window_num) * $max_page_links + 1), $request_type) . '" title=" ' . sprintf(PREVNEXT_TITLE_NEXT_SET_OF_NO_PAGE, $max_page_links) . ' ">...</a>';
+            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . $this->page_name . '=' . (($cur_window_num) * $max_page_links + 1)) . '" title=" ' . sprintf(PREVNEXT_TITLE_NEXT_SET_OF_NO_PAGE, $max_page_links) . ' ">...</a>';
           $display_links_string .= '</li>';
         }
 
 // next button
         if (($this->current_page_number < $this->number_of_pages) && ($this->number_of_pages != 1)) {
           $display_links_string .= '<li class="page-item">';
-            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . 'page=' . ($this->current_page_number + 1), $request_type) . '" aria-label=" ' . PREVNEXT_TITLE_NEXT_PAGE . ' "><span aria-hidden="true"><i class="fas fa-angle-right"></i></span></a>';
+            $display_links_string .= '<a class="page-link" href="' . tep_href_link($PHP_SELF, $parameters . 'page=' . ($this->current_page_number + 1)) . '" aria-label=" ' . PREVNEXT_TITLE_NEXT_PAGE . ' "><span aria-hidden="true"><i class="fas fa-angle-right"></i></span></a>';
             $display_links_string .= '<span class="sr-only">' . PREVNEXT_TITLE_NEXT_PAGE . '</span>';
           $display_links_string .= '</li>';
         } else {

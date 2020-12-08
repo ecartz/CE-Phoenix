@@ -16,13 +16,14 @@
 
     function execute() {
       if ($product = random_review::build()) {
-        $product->set('extra',
-          tep_draw_stars($product->get('reviews_rating')) . '<br>'
-          . htmlspecialchars($product->get('reviews_text')) . '...');
+        $card = [
+          'extra' => tep_draw_stars($product->get('reviews_rating')) . '<br>'
+                   . htmlspecialchars($product->get('reviews_text')) . '...',
+        ];
 
         $box = [
           'parameters' => ['product_card.php', 'component'],
-          'classes' => 'is-product bm-whats-new',
+          'classes' => 'is-product bm-reviews',
           'title' => '<a href="' . $product->get('link') . '">' . $product->get('name') . '</a>',
           'attributes' => $product->build_data_attributes(),
         ];

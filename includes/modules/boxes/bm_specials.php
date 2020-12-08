@@ -18,7 +18,7 @@
       if ($product = random_special::build()) {
         $box = [
           'parameters' => ['product_card.php', 'component'],
-          'classes' => 'is-product bm-whats-new',
+          'classes' => 'is-product bm-specials',
           'title' => '<a href="' . $product->get('link') . '">' . $product->get('name') . '</a>',
           'attributes' => $product->build_data_attributes(),
         ];

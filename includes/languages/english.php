@@ -114,20 +114,6 @@ const TEXT_SEARCH_PLACEHOLDER = 'Search';
 const FORM_REQUIRED_INFORMATION = '<i class="fas fa-asterisk text-danger"></i> Required information';
 const FORM_REQUIRED_INPUT = '<span class="form-control-feedback text-danger"><i class="fas fa-asterisk"></i></span>';
 
-// grid/list
-const TEXT_SORT_BY = 'Sort By ';
-// moved from index
-const TABLE_HEADING_IMAGE = '';
-const TABLE_HEADING_MODEL = 'Model';
-const TABLE_HEADING_PRODUCTS = 'Product Name';
-const TABLE_HEADING_MANUFACTURER = 'Manufacturer';
-const TABLE_HEADING_QUANTITY = 'Stock';
-const TABLE_HEADING_PRICE = 'Price';
-const TABLE_HEADING_WEIGHT = 'Weight';
-const TABLE_HEADING_BUY_NOW = 'Buy Now';
-const TABLE_HEADING_LATEST_ADDED = 'Date Added';
-const TABLE_HEADING_ORDERED = 'Most Popular';
-
 // product notifications
 const PRODUCT_SUBSCRIBED = '%s has been added to your Notification List';
 const PRODUCT_UNSUBSCRIBED = '%s has been removed from your Notification List';

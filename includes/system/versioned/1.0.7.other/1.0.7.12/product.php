@@ -18,8 +18,12 @@
       }
 
       if (isset($this->_data['id']) && !isset($this->_data['link'])) {
-        $this->_data['link'] = tep_href_link('product_info.php', 'products_id=' . (int)$this->_data['id']);
+        $this->_data['link'] = static::build_link((int)$this->_data['id']);
       }
+    }
+
+    public static function build_link($id, $parameters = '') {
+      return tep_href_link('product_info.php', "{$parameters}products_id=" . (int)$id);
     }
 
     public function has($key) {
