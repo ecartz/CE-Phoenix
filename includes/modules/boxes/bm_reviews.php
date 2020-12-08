@@ -24,7 +24,7 @@
         $box = [
           'parameters' => ['product_card.php', 'component'],
           'classes' => 'is-product bm-reviews',
-          'title' => '<a href="' . $product->get('link') . '">' . $product->get('name') . '</a>',
+          'title' => MODULE_BOXES_REVIEWS_BOX_TITLE,
           'attributes' => $product->build_data_attributes(),
         ];
 

@@ -19,30 +19,32 @@
     }
 
     public function execute() {
-      global $current_category_id, $currencies, $PHP_SELF;
-
-      $content_width = MODULE_CONTENT_IN_CARD_PRODUCTS_CONTENT_WIDTH;
-      $card_layout = IS_PRODUCT_PRODUCTS_DISPLAY_ROW;
-
-      $card_products_query = tep_db_query(<<<'EOSQL'
+      $card_products_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT DISTINCT p.*, pd.*,
   IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
   IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
   p.products_quantity AS in_stock,
-  IF(s.status, 1, 0) AS is_special
+  IF(s.status, 1, 0) AS is_special,
+  IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
  FROM products p
   LEFT JOIN specials s ON p.products_id = s.products_id
   INNER JOIN products_description pd ON p.products_id = pd.products_id
   INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
   INNER JOIN categories c ON p2c.categories_id = c.categories_id
- WHERE p.products_status = 1 AND c.parent_id = 
+  LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
+ WHERE p.products_status = 1 AND c.parent_id = %d AND pd.language_id = %d
+ ORDER BY p.products_id DESC LIMIT %d
 EOSQL
-        . (int)$current_category_id . " AND pd.language_id = " . (int)$_SESSION['languages_id']
-        . " ORDER BY p.products_id DESC LIMIT " . (int)MODULE_CONTENT_IN_CARD_PRODUCTS_MAX_DISPLAY);
+        , (int)$GLOBALS['current_category_id'],
+          (int)$_SESSION['languages_id'],
+          (int)MODULE_CONTENT_IN_CARD_PRODUCTS_MAX_DISPLAY));
 
       $num_card_products = tep_db_num_rows($card_products_query);
-
       if ($num_card_products > 0) {
+        $card = [
+          'show_buttons' => true,
+        ];
+
         $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
         include 'includes/modules/content/cm_template.php';
       }

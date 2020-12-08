@@ -29,12 +29,12 @@ SELECT pd.*, p.*,
 EOSQL
         , (int)$product_id, (int)$_SESSION['languages_id']));
 
-      if ($data = tep_db_fetch_array($product_query)) {
+      if ($product = tep_db_fetch_array($product_query)) {
         if (!empty($get_parameters)) {
-          $data['link'] = Product::build_link($product_id, $get_parameters);
+          $product['link'] = Product::build_link($product_id, $get_parameters);
         }
 
-        return new Product($data);
+        return new Product($product);
       }
 
       return new Product(['status' => 0, 'id' => (int)$product_id]);

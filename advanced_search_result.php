@@ -12,7 +12,7 @@
 
   require 'includes/application_top.php';
 
-  require "includes/languages/$language/advanced_search.php";
+  require language::map_to_translation('advanced_search.php');
 
   $error = false;
 
@@ -91,13 +91,20 @@
     tep_redirect(tep_href_link('advanced_search.php', tep_get_all_get_params(), 'NONSSL', true, false));
   }
 
-  $select_str = "SELECT DISTINCT p.products_id, m.*, p.*, pd.*, p.products_quantity AS in_stock, IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price, IF(s.status, s.specials_new_products_price, p.products_price) AS final_price, IF(s.status, 1, 0) AS is_special ";
+  $select_str = <<<'EOSQL'
+SELECT DISTINCT p.products_id, m.*, p.*, pd.*,
+    p.products_quantity AS in_stock,
+    IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
+    IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
+    IF(s.status, 1, 0) AS is_special,
+    IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
+EOSQL;
 
   if ( (DISPLAY_PRICE_WITH_TAX == 'true') && (tep_not_null($pfrom) || tep_not_null($pto)) ) {
-    $select_str .= ", SUM(tr.tax_rate) AS tax_rate ";
+    $select_str .= ", SUM(tr.tax_rate) AS tax_rate";
   }
 
-  $from_str = "FROM products p LEFT JOIN manufacturers m using(manufacturers_id) LEFT JOIN specials s ON p.products_id = s.products_id";
+  $from_str = " FROM products p LEFT JOIN manufacturers m USING(manufacturers_id) LEFT JOIN specials s ON p.products_id = s.products_id";
 
   if ( (DISPLAY_PRICE_WITH_TAX == 'true') && (tep_not_null($pfrom) || tep_not_null($pto)) ) {
     if (isset($_SESSION['customer_id'])) {
@@ -107,27 +114,39 @@
       $country_id = STORE_COUNTRY;
       $zone_id = STORE_ZONE;
     }
-    $from_str .= " LEFT JOIN tax_rates tr ON p.products_tax_class_id = tr.tax_class_id LEFT JOIN zones_to_geo_zones gz ON tr.tax_zone_id = gz.geo_zone_id AND (gz.zone_country_id IS NULL OR gz.zone_country_id = '0' OR gz.zone_country_id = " . (int)$country_id . ") AND (gz.zone_id IS NULL OR gz.zone_id = '0' OR gz.zone_id = " . (int)$zone_id . ")";
+    $from_str .= sprintf(<<<'EOSQL'
+    LEFT JOIN tax_rates tr ON p.products_tax_class_id = tr.tax_class_id
+    LEFT JOIN zones_to_geo_zones gz
+      ON tr.tax_zone_id = gz.geo_zone_id
+     AND (gz.zone_country_id IS NULL OR gz.zone_country_id = '0' OR gz.zone_country_id = %d)
+     AND (gz.zone_id IS NULL OR gz.zone_id = '0' OR gz.zone_id = %d)
+EOSQL
+    , (int)$country_id, (int)$zone_id);
   }
 
-  $from_str .= ", products_description pd, categories c, products_to_categories p2c";
+  $from_str .= <<<'EOSQL'
+    INNER JOIN products_description pd ON p.products_id = pd.products_id
+    INNER JOIN products_to_categories p2c ON pd.products_id = p2c.categories_id
+    INNER JOIN categories c ON p2c.categories_id = p.categories_id
+    LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
+EOSQL;
 
-  $where_str = " WHERE p.products_status = 1 AND p.products_id = pd.products_id AND pd.language_id = " . (int)$languages_id . " AND p.products_id = p2c.products_id AND p2c.categories_id = c.categories_id ";
+  $where_str = sprintf(" WHERE p.products_status = 1 AND pd.language_id = %d ", (int)$_SESSION['languages_id']);
 
   if (isset($_GET['categories_id']) && tep_not_null($_GET['categories_id'])) {
     if (isset($_GET['inc_subcat']) && ($_GET['inc_subcat'] == '1')) {
       $subcategories_array = [];
       tep_get_subcategories($subcategories_array, $_GET['categories_id']);
 
-      $where_str .= " AND p2c.products_id = p.products_id AND p2c.products_id = pd.products_id AND (p2c.categories_id = " . (int)$_GET['categories_id'];
+      $where_str .= " AND (c.categories_id = " . (int)$_GET['categories_id'];
 
       foreach ($subcategories_array as $subcategory_id) {
-        $where_str .= " OR p2c.categories_id = " . (int)$subcategory_id;
+        $where_str .= " OR c.categories_id = " . (int)$subcategory_id;
       }
 
       $where_str .= ")";
     } else {
-      $where_str .= " AND p2c.products_id = p.products_id AND p2c.products_id = pd.products_id AND pd.language_id = " . (int)$languages_id . " AND p2c.categories_id = " . (int)$_GET['categories_id'];
+      $where_str .= " AND c.categories_id = " . (int)$_GET['categories_id'];
     }
   }
 
@@ -143,7 +162,7 @@
         case ')':
         case 'and':
         case 'or':
-          $where_str .= " " . $search_keyword . " ";
+          $where_str .= " " . strtoupper($search_keyword) . " ";
           break;
         default:
           $keyword = tep_db_prepare_input($search_keyword);
@@ -152,7 +171,9 @@
             $where_str .= "pd.products_seo_keywords LIKE '%" . tep_db_input($keyword) . "%' OR ";
           }
           $where_str .= "pd.products_name LIKE '%" . tep_db_input($keyword) . "%' OR p.products_model LIKE '%" . tep_db_input($keyword) . "%' OR m.manufacturers_name LIKE '%" . tep_db_input($keyword) . "%'";
-          if (isset($_GET['search_in_description']) && ($_GET['search_in_description'] == '1')) $where_str .= " OR pd.products_description LIKE '%" . tep_db_input($keyword) . "%'";
+          if (isset($_GET['search_in_description']) && ($_GET['search_in_description'] == '1')) {
+            $where_str .= " OR pd.products_description LIKE '%" . tep_db_input($keyword) . "%'";
+          }
           $where_str .= ')';
           break;
       }
@@ -175,11 +196,19 @@
   }
 
   if (DISPLAY_PRICE_WITH_TAX == 'true') {
-    if ($pfrom > 0) $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) * IF(gz.geo_zone_id IS NULL, 1, 1 + (tr.tax_rate / 100) ) >= " . (double)$pfrom . ")";
-    if ($pto > 0) $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) * IF(gz.geo_zone_id IS NULL, 1, 1 + (tr.tax_rate / 100) ) <= " . (double)$pto . ")";
+    if ($pfrom > 0) {
+      $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) * IF(gz.geo_zone_id IS NULL, 1, 1 + (tr.tax_rate / 100) ) >= " . (double)$pfrom . ")";
+    }
+    if ($pto > 0) {
+      $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) * IF(gz.geo_zone_id IS NULL, 1, 1 + (tr.tax_rate / 100) ) <= " . (double)$pto . ")";
+    }
   } else {
-    if ($pfrom > 0) $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) >= " . (double)$pfrom . ")";
-    if ($pto > 0) $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) <= " . (double)$pto . ")";
+    if ($pfrom > 0) {
+      $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) >= " . (double)$pfrom . ")";
+    }
+    if ($pto > 0) {
+      $where_str .= " AND (IF(s.status, s.specials_new_products_price, p.products_price) <= " . (double)$pto . ")";
+    }
   }
 
   if ( (DISPLAY_PRICE_WITH_TAX == 'true') && (tep_not_null($pfrom) || tep_not_null($pto)) ) {

@@ -40,37 +40,37 @@ EOSQL;
 // show the products in a given category
         if (isset($_GET['filter_id']) && tep_not_null($_GET['filter_id'])) {
 // We are asked to show only a specific manufacturer
-          $listing_sql .= <<<'EOSQL'
+          $listing_sql .= sprintf(<<<'EOSQL'
     INNER JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
     INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
- WHERE p.products_status = 1 AND m.manufacturers_id = 
+ WHERE p.products_status = 1 AND m.manufacturers_id = %d AND pd.language_id = %d AND p2c.categories_id = %d
 EOSQL
-          . (int)$_GET['filter_id'] . " AND pd.language_id = " . (int)$_SESSION['languages_id'] . " AND p2c.categories_id = " . (int)$current_category_id;
+          , (int)$_GET['filter_id'], (int)$_SESSION['languages_id'], (int)$current_category_id);
         } else {
 // We show them all
-          $listing_sql .= <<<'EOSQL'
+          $listing_sql .= sprintf(<<<'EOSQL'
     LEFT JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
-    INNER JOIN products_to_categories p2c
-  WHERE p.products_status = 1 AND p.products_id = p2c.products_id AND pd.products_id = p2c.products_id AND pd.language_id = 
+    INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
+  WHERE p.products_status = 1 AND pd.language_id = %d AND p2c.categories_id = %d
 EOSQL
-          . (int)$_SESSION['languages_id'] . " AND p2c.categories_id = " . (int)$current_category_id;
+          , (int)$_SESSION['languages_id'], (int)$current_category_id);
         }
       } else {
         if (isset($_GET['filter_id']) && tep_not_null($_GET['filter_id'])) {
 // We are asked to show only a specific category
-          $listing_sql .= <<<'EOSQL'
+          $listing_sql .= sprintf(<<<'EOSQL'
     INNER JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
     INNER JOIN products_to_categories p2c ON p.products_id = p2c.products_id
-  WHERE p.products_status = 1 AND m.manufacturers_id = 
+  WHERE p.products_status = 1 AND m.manufacturers_id = %d AND pd.language_id = %d AND p2c.categories_id = %d
 EOSQL
-          . (int)$_GET['manufacturers_id'] . " AND pd.language_id = " . (int)$_SESSION['languages_id'] . " AND p2c.categories_id = " . (int)$_GET['filter_id'];
+          , (int)$_GET['manufacturers_id'], (int)$_SESSION['languages_id'], (int)$_GET['filter_id']);
         } else {
 // We show them all
-          $listing_sql .= <<<'EOSQL'
+          $listing_sql .= sprintf(<<<'EOSQL'
     INNER JOIN manufacturers m ON p.manufacturers_id = m.manufacturers_id
-  WHERE p.products_status = 1 AND pd.language_id = 
+  WHERE p.products_status = 1 AND pd.language_id = %d AND m.manufacturers_id = %d
 EOSQL
-          . (int)$_SESSION['languages_id'] . " AND m.manufacturers_id = " . (int)$_GET['manufacturers_id'];
+          , (int)$_SESSION['languages_id'], (int)$_GET['manufacturers_id']);
         }
       }
 
@@ -81,27 +81,28 @@ EOSQL
       $output = null;
       if (PRODUCT_LIST_FILTER > 0) {
         if (empty($_GET['manufacturers_id'])) {
-          $filterlist_sql = <<<'EOSQL'
+          $filterlist_sql = sprintf(<<<'EOSQL'
 SELECT DISTINCT m.manufacturers_id AS id, m.manufacturers_name AS name
  FROM products p, products_to_categories p2c, manufacturers m
  WHERE p.products_status = 1
    AND p.manufacturers_id = m.manufacturers_id
    AND p.products_id = p2c.products_id
-   AND p2c.categories_id = 
+   AND p2c.categories_id = %d
+ ORDER BY m.manufacturers_name
 EOSQL
-          . (int)$current_category_id . " ORDER BY m.manufacturers_name";
+          , (int)$current_category_id);
         } else {
-          $filterlist_sql = <<<'EOSQL'
+          $filterlist_sql = sprintf(<<<'EOSQL'
 SELECT DISTINCT c.categories_id AS id, cd.categories_name AS name
  FROM products p, products_to_categories p2c, categories c, categories_description cd
  WHERE p.products_status = 1
    AND p.products_id = p2c.products_id
    AND p2c.categories_id = c.categories_id
    AND p2c.categories_id = cd.categories_id
-   AND cd.language_id = 
+   AND cd.language_id = %d AND p.manufacturers_id = %d
+ ORDER BY cd.categories_name
 EOSQL
-          . (int)$_SESSION['languages_id'] . " AND p.manufacturers_id = " . (int)$_GET['manufacturers_id']
-          . " ORDER BY cd.categories_name";
+          , (int)$_SESSION['languages_id'], (int)$_GET['manufacturers_id']);
         }
 
         $filterlist_query = tep_db_query($filterlist_sql);
@@ -123,8 +124,6 @@ EOSQL
           $output .= tep_hide_session_id();
         }
       }
-
-      $content_width = MODULE_CONTENT_IP_PRODUCT_LISTING_CONTENT_WIDTH;
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

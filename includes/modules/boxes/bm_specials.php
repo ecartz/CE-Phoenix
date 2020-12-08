@@ -19,7 +19,7 @@
         $box = [
           'parameters' => ['product_card.php', 'component'],
           'classes' => 'is-product bm-specials',
-          'title' => '<a href="' . $product->get('link') . '">' . $product->get('name') . '</a>',
+          'title' => sprintf(MODULE_BOXES_SPECIALS_BOX_TITLE, tep_href_link('specials.php')),
           'attributes' => $product->build_data_attributes(),
         ];
 
