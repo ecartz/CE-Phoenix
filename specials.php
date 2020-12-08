@@ -12,7 +12,7 @@
 
   require 'includes/application_top.php';
 
-  require require language::map_to_translation('specials.php');
+  require language::map_to_translation('specials.php');
 
   $listing_sql = sprintf(<<<'EOSQL'
 SELECT p.*, pd.*, m.*,

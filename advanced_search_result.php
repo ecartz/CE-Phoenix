@@ -127,7 +127,7 @@ EOSQL
   $from_str .= <<<'EOSQL'
     INNER JOIN products_description pd ON p.products_id = pd.products_id
     INNER JOIN products_to_categories p2c ON pd.products_id = p2c.categories_id
-    INNER JOIN categories c ON p2c.categories_id = p.categories_id
+    INNER JOIN categories c ON p2c.categories_id = c.categories_id
     LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
 EOSQL;
 
