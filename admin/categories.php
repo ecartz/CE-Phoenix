@@ -15,13 +15,13 @@
   $currencies = new currencies();
 
   // calculate category path
-  $cPath = $_GET['cPath'] ?? '';
-  if (tep_not_null($cPath)) {
-    $cPath_array = tep_parse_category_path($cPath);
+  if (empty($_GET['cPath'])) {
+    $current_category_id = 0;
+    $cPath = '';
+  } else {
+    $cPath_array = tep_parse_category_path($_GET['cPath']);
     $cPath = implode('_', $cPath_array);
     $current_category_id = end($cPath_array);
-  } else {
-    $current_category_id = 0;
   }
 
   const DIR_FS_CATALOG_IMAGES = DIR_FS_CATALOG . 'images/';
@@ -108,42 +108,29 @@
         if (isset($_POST['categories_id'])) {
           $categories_id = tep_db_prepare_input($_POST['categories_id']);
 
-          $categories = tep_get_category_tree($categories_id, '', '0', '', true);
-          $products = [];
+          $category_tree = new category_tree();
+          $descendants = $category_tree->getChildren($categories_id);
+          $descendants[] = $categories_id;
+
+          $product_ids_query = tep_db_query(sprintf(<<<'EOSQL'
+SELECT c1.products_id
+ FROM products_to_categories c1 LEFT JOIN products_to_categories c2
+   ON c1.products_id = c2.products_id AND c1.categories_id != c2.categories_id
+ WHERE c1.categories_id IN (%s) AND c2.categories_id IS NULL
+EOSQL
+            , implode(', ', array_map('intval', $descendants))));
+
           $products_delete = [];
-
-          for ($i=0, $n=count($categories); $i<$n; $i++) {
-            $product_ids_query = tep_db_query("select products_id from products_to_categories where categories_id = '" . (int)$categories[$i]['id'] . "'");
-
-            while ($product_ids = tep_db_fetch_array($product_ids_query)) {
-              $products[$product_ids['products_id']]['categories'][] = $categories[$i]['id'];
-            }
+          while ($product_ids = tep_db_fetch_array($product_ids_query)) {
+            $products_delete[] = $product_ids['products_id'];
           }
-
-          foreach ($products as $key => $value) {
-            $category_ids = '';
-
-            for ($i=0, $n=count($value['categories']); $i<$n; $i++) {
-              $category_ids .= "'" . (int)$value['categories'][$i] . "', ";
-            }
-            $category_ids = substr($category_ids, 0, -2);
-
-            $check_query = tep_db_query("select count(*) as total from products_to_categories where products_id = '" . (int)$key . "' and categories_id not in (" . $category_ids . ")");
-            $check = tep_db_fetch_array($check_query);
-            if ($check['total'] < '1') {
-              $products_delete[$key] = $key;
-            }
-          }
+          print_r([$descendants, $products_delete]);
+          die();
 
 // removing categories can be a lengthy process
           tep_set_time_limit(0);
-          for ($i=0, $n=count($categories); $i<$n; $i++) {
-            tep_remove_category($categories[$i]['id']);
-          }
-
-          foreach ($products_delete as $key) {
-            tep_remove_product($key);
-          }
+          array_filter($descendants, 'tep_remove_category');
+          array_filter($products_delete, 'tep_remove_product');
         }
 
         $OSCOM_Hooks->call('categories', 'deleteCategoryConfirmAction');
@@ -994,15 +981,11 @@ function updateNet() {
               <?php
             }
 
-            $cPath_back = '';
-            if (isset($cPath_array) && count($cPath_array) > 0) {
-              $cPath_back .= $cPath_array[0];
-              for ($i=1, $n=count($cPath_array)-1; $i<$n; $i++) {
-                $cPath_back .= '_' . $cPath_array[$i];
-              }
+            if (isset($cPath_array) && count($cPath_array) > 1) {
+              $cPath_back = 'cPath=' . implode('_', array_slice($cPath_array, 0, -1)) . '&';
+            } else {
+              $cPath_back = '';
             }
-
-            $cPath_back = (tep_not_null($cPath_back)) ? 'cPath=' . $cPath_back . '&' : '';
             ?>
           </tbody>
         </table>
@@ -1010,7 +993,7 @@ function updateNet() {
 
       <div class="row my-1">
         <div class="col"><?= TEXT_CATEGORIES . '&nbsp;' . $categories_count . '<br>' . TEXT_PRODUCTS . '&nbsp;' . $products_count ?></div>
-        <div class="col text-right mr-2"><?php if (isset($cPath_array) && (count($cPath_array) > 0)) echo tep_draw_bootstrap_button(IMAGE_BACK, 'fas fa-angle-left', tep_href_link('categories.php', $cPath_back), null, null, 'btn-light mr-2'); if (!isset($_GET['search'])) echo tep_draw_bootstrap_button(IMAGE_NEW_CATEGORY, 'fas fa-sitemap', tep_href_link('categories.php', 'cPath=' . $cPath . '&action=new_category'), null, null, 'btn-danger mr-2') . tep_draw_bootstrap_button(IMAGE_NEW_PRODUCT, 'fas fa-boxes', tep_href_link('categories.php', 'cPath=' . $cPath . '&action=new_product'), null, null, 'btn-danger') ?></div>
+        <div class="col text-right mr-2"><?php if (isset($cPath_array) && (count($cPath_array) > 0)) echo tep_draw_bootstrap_button(IMAGE_BACK, 'fas fa-angle-left', tep_href_link('categories.php', $cPath_back), null, null, 'btn-light mr-2'); if (!isset($_GET['search'])) echo tep_draw_bootstrap_button(IMAGE_NEW_CATEGORY, 'fas fa-sitemap', tep_href_link('categories.php', 'cPath=' . $cPath . '&action=new_category'), null, null, 'btn-danger mr-2') . tep_draw_bootstrap_button(IMAGE_NEW_PRODUCT, 'fas fa-boxes', tep_href_link('categories.php', 'cPath=' . $cPath . '&action=new_product'), null, null, 'btn-danger'); ?></div>
       </div>
 
     </div>
