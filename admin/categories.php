@@ -109,7 +109,7 @@
           $categories_id = tep_db_prepare_input($_POST['categories_id']);
 
           $category_tree = new category_tree();
-          $descendants = $category_tree->getChildren($categories_id);
+          $descendants = $category_tree->getDescendants($categories_id);
           $descendants[] = $categories_id;
 
           $product_ids_query = tep_db_query(sprintf(<<<'EOSQL'
@@ -124,8 +124,6 @@ EOSQL
           while ($product_ids = tep_db_fetch_array($product_ids_query)) {
             $products_delete[] = $product_ids['products_id'];
           }
-          print_r([$descendants, $products_delete]);
-          die();
 
 // removing categories can be a lengthy process
           tep_set_time_limit(0);
@@ -138,15 +136,14 @@ EOSQL
         tep_redirect(tep_href_link('categories.php', 'cPath=' . $cPath));
         break;
       case 'delete_product_confirm':
-        if (isset($_POST['products_id']) && isset($_POST['product_categories']) && is_array($_POST['product_categories'])) {
+        if (isset($_POST['products_id'], $_POST['product_categories']) && is_array($_POST['product_categories'])) {
           $product_id = tep_db_prepare_input($_POST['products_id']);
-          $product_categories = $_POST['product_categories'];
 
-          for ($i=0, $n=count($product_categories); $i<$n; $i++) {
-            tep_db_query("delete from products_to_categories where products_id = '" . (int)$product_id . "' and categories_id = '" . (int)$product_categories[$i] . "'");
+          foreach ($_POST['product_categories'] as $category_id) {
+            tep_db_query("DELETE FROM products_to_categories WHERE products_id = " . (int)$product_id . " AND categories_id = " . (int)tep_db_prepare_input($category_id));
           }
 
-          $product_categories_query = tep_db_query("select count(*) as total from products_to_categories where products_id = '" . (int)$product_id . "'");
+          $product_categories_query = tep_db_query("SELECT COUNT(*) AS total FROM products_to_categories WHERE products_id = " . (int)$product_id);
           $product_categories = tep_db_fetch_array($product_categories_query);
 
           if ($product_categories['total'] == '0') {
