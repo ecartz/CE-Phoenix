@@ -84,8 +84,17 @@
     }
 
     function add_cart($products_id, $qty = 1, $attributes = null, $notify = true) {
+      if ($products_id instanceof Product) {
+        $product = $products_id;
+        $products_id = $product->get('id');
+      }
+
       $products_id_string = tep_get_uprid($products_id, $attributes);
       $products_id = tep_get_prid($products_id_string);
+
+      if (!isset($product)) {
+        $product = product_by_id::build($products_id);
+      }
 
       if (defined('MAX_QTY_IN_CART') && (MAX_QTY_IN_CART > 0) && ((int)$qty > MAX_QTY_IN_CART)) {
         $qty = MAX_QTY_IN_CART;
@@ -94,23 +103,23 @@
       if (!empty($attributes) && is_array($attributes)) {
         foreach ($attributes as $option => $value) {
           if (!is_numeric($option) || !is_numeric($value)) {
-            return;
+            return false;
           }
 
           $check_query = tep_db_query("SELECT products_attributes_id FROM products_attributes WHERE products_id = " . (int)$products_id . " AND options_id = " . (int)$option . " AND options_values_id = " . (int)$value . " LIMIT 1");
           if (tep_db_num_rows($check_query) < 1) {
-            return;
+            return false;
           }
         }
-      } elseif (tep_has_product_attributes($products_id)) {
-        return;
+      } elseif ($product->get('has_attributes')) {
+        return false;
       }
 
       if (is_numeric($products_id) && is_numeric($qty)) {
         $check_product_query = tep_db_query("SELECT products_status FROM products WHERE products_id = " . (int)$products_id);
         $check_product = tep_db_fetch_array($check_product_query);
 
-        if (($check_product !== false) && ($check_product['products_status'] == '1')) {
+        if ($product->get('status')) {
           if ($notify) {
             $_SESSION['new_products_id_in_cart'] = $products_id;
           }
@@ -141,6 +150,8 @@
           $this->cartID = $this->generate_cart_id();
         }
       }
+
+      return $product->get('name');
     }
 
     function update_quantity($products_id, $quantity, $attributes = null) {

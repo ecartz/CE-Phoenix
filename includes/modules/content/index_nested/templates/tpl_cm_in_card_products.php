@@ -7,7 +7,7 @@
       $product = new Product($card_product);
       ?>
       <div class="col mb-2">
-        <div class="card h-100 is-product" <?= $product->build_data_attributes() ?>">
+        <div class="card h-100 is-product" <?= $product->get('data_attributes') ?>">
           <?php include $GLOBALS['oscTemplate']->map_to_template('product_card.php', 'component'); ?>
         </div>
       </div>

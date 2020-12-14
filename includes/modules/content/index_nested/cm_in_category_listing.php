@@ -25,8 +25,8 @@
       $category_card_layout = MODULE_CONTENT_IN_CATEGORY_LISTING_DISPLAY_ROW;
 
       $category_name  = $OSCOM_category->getData($current_category_id, 'name');
-      $category_level = $OSCOM_category->setMaximumLevel(1);
-      $category_array = $OSCOM_category->buildBranchArray($current_category_id, $category_level);
+      $OSCOM_category->setMaximumLevel(1);
+      $category_array = $OSCOM_category->buildBranchArray($current_category_id);
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

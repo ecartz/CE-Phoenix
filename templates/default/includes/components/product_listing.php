@@ -72,9 +72,7 @@
       }
 
       $prod_list_contents .= '<div class="col mb-2">';
-        $prod_list_contents .= '<div class="card h-100 is-product" data-is-special="' . (int)$product->get('is_special')
-                             . '" data-product-price="' . $product->format_raw('final_price')
-                             . '" data-product-manufacturer="' . max(0, (int)$product->get('manufacturers_id')) . '">' . PHP_EOL;
+        $prod_list_contents .= '<div class="card h-100 is-product"' . $product->get('data_attributes') . '>' . PHP_EOL;
 
           ob_start();
           include $GLOBALS['oscTemplate']->map_to_template('product_card.php', 'component');

@@ -32,7 +32,7 @@
         'parameters' => ['product_card.php', 'component'],
         'classes' => 'is-product bm-whats-new',
         'title' => sprintf(MODULE_BOXES_WHATS_NEW_BOX_TITLE, tep_href_link('products_new.php')),
-        'attributes' => $product->build_data_attributes(),
+        'attributes' => $product->get('data_attributes'),
       ];
 
       $tpl_data = [

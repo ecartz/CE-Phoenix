@@ -13,21 +13,20 @@
   class osC_Actions_cust_order {
 
     public static function execute() {
-      global $messageStack, $goto, $parameters;
-
       if (isset($_SESSION['customer_id'], $_GET['pid'])) {
         $pid = (int)$_GET['pid'];
+        $product = product_by_id::build($pid);
 
-        if (tep_has_product_attributes($pid)) {
-          tep_redirect(tep_href_link('product_info.php', 'products_id=' . $pid));
+        if ($product->get('has_attributes')) {
+          tep_redirect($product->get('link'));
         } else {
-          $_SESSION['cart']->add_cart($pid, $_SESSION['cart']->get_quantity($pid)+1);
+          $_SESSION['cart']->add_cart($product, $_SESSION['cart']->get_quantity($pid)+1);
 
-          $messageStack->add_session('product_action', sprintf(PRODUCT_ADDED, tep_get_products_name($pid)), 'success');
+          $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_ADDED, $product->get('name')), 'success');
         }
       }
 
-      tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+      tep_redirect(tep_href_link($GLOBALS['goto'], tep_get_all_get_params($GLOBALS['parameters'])));
     }
 
   }

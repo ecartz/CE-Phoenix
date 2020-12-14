@@ -13,20 +13,20 @@
   class osC_Actions_add_product {
 
     public static function execute() {
-      global $messageStack, $goto, $parameters;
-
       if (isset($_POST['products_id'])) {
         $pid = (int)$_POST['products_id'];
         $attributes = $_POST['id'] ?? '';
 
-        $qty = (!empty($_POST['qty'])) ? (int)$_POST['qty'] : 1;
+        $qty = empty($_POST['qty']) ? 1: (int)$_POST['qty'];
 
-        $_SESSION['cart']->add_cart($_POST['products_id'], $_SESSION['cart']->get_quantity(tep_get_uprid($pid, $attributes))+$qty, $attributes);
+        $name = $_SESSION['cart']->add_cart($_POST['products_id'], $_SESSION['cart']->get_quantity(tep_get_uprid($pid, $attributes))+$qty, $attributes);
 
-        $messageStack->add_session('product_action', sprintf(PRODUCT_ADDED, tep_get_products_name((int)$_POST['products_id'])), 'success');
+        if ($name) {
+          $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_ADDED, $name), 'success');
+        }
       }
 
-      tep_redirect(tep_href_link($goto, tep_get_all_get_params($parameters)));
+      tep_redirect(tep_href_link($GLOBALS['goto'], tep_get_all_get_params($GLOBALS['parameters'])));
     }
 
   }

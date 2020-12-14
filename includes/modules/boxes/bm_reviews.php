@@ -25,7 +25,7 @@
           'parameters' => ['product_card.php', 'component'],
           'classes' => 'is-product bm-reviews',
           'title' => MODULE_BOXES_REVIEWS_BOX_TITLE,
-          'attributes' => $product->build_data_attributes(),
+          'attributes' => $product->get('data_attributes'),
         ];
 
         $tpl_data = [

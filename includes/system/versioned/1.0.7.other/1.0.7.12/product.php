@@ -6,11 +6,13 @@
  * @license BSD License; http://www.oscommerce.com/bsdlicense.txt
  */
 
-  class Product {
+  class Product extends product_loader {
 
     protected $_data = [];
 
     public function __construct($data = ['status' => 0]) {
+      parent::__construct();
+
       foreach ($data as $key => $value) {
         $trimmed_key = tep_ltrim_once($key, 'products_');
 
@@ -22,8 +24,8 @@
       }
     }
 
-    public static function build_link($id, $parameters = '') {
-      return tep_href_link('product_info.php', "{$parameters}products_id=" . (int)$id);
+    public function can($key) {
+      return $this->has($key) || parent::can($key);
     }
 
     public function has($key) {
@@ -31,11 +33,15 @@
     }
 
     public function get($key) {
-      return $this->_data[$key];
-    }
+      if (!isset($this->_data[$key])) {
+        if (parent::can($key)) {
+          call_user_func(static::$capabilities[$key], $this);
+        } else {
+          return null;
+        }
+      }
 
-    public function welcome($key) {
-      return $this->has($key) ? $this->get($key) : null;
+      return $this->_data[$key];
     }
 
     public function set($key, $value) {
@@ -44,18 +50,6 @@
 
     public function get_data() {
       return $this->_data;
-    }
-
-    public function build_data_attributes($data = []) {
-      $data['data-is-special'] = $this->get('is_special');
-      $data['data-product-price'] = $this->format_raw();
-      $data['data-product-manufacturer'] = $this->get('manufacturers_id');
-
-      $this->_data['data-attributes'] = implode(array_map(function ($key, $value) {
-        return ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
-      }, array_keys($data), $data));
-
-      return $this->_data['data-attributes'];
     }
 
     public function hype_price($show_special_price = true) {
@@ -75,6 +69,10 @@
 
     public function format_raw($price = 'final_price') {
       return $GLOBALS['currencies']->display_raw($this->get($price), tep_get_tax_rate($this->get('tax_class_id')));
+    }
+
+    public function increment_view_count() {
+      tep_db_query("UPDATE products_description SET products_viewed = products_viewed+1 WHERE products_id = " . (int)$this->get('id') . " AND language_id = " . (int)$_SESSION['languages_id']);
     }
 
   }
