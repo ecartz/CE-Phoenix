@@ -64,15 +64,15 @@
     }
 
     public function buildBranchArray($parent_id, $level = 0, $result = []) {
-      foreach ($this->_data[$parent_id] as $id => $data) {
+      foreach ($this->tree->get_children($parent_id) as $id) {
         $link = $this->breadcrumb_usage
               ? $this->buildBreadcrumb($id)
               : $id;
 
         $result[] = [
           'id' => $link,
-          'image' => $data['image'],
-          'title' => str_repeat($this->spacer_string, $this->spacer_multiplier * $level) . $data['name'],
+          'image' => $this->tree->get($id, 'image'),
+          'title' => str_repeat($this->spacer_string, $this->spacer_multiplier * $level) . $this->tree->get($id, 'name'),
         ];
 
         if (isset($this->_data[$id])
