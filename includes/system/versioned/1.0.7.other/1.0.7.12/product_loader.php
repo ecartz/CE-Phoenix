@@ -126,6 +126,7 @@ EOSQL
 SELECT *
  FROM products_images
  WHERE products_id = %d
+ ORDER BY sort_order
 EOSQL
         , (int)$product->get('id')));
 

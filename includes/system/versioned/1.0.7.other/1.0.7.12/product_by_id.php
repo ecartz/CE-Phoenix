@@ -19,6 +19,7 @@ SELECT pd.*, p.*,
     IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
     p.products_quantity AS in_stock,
     IF(s.status, 1, 0) AS is_special,
+    IF(s.status, s.expires_date, NULL) AS special_expiration,
     IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
   FROM products_description pd
     INNER JOIN products p ON pd.products_id = p.products_id

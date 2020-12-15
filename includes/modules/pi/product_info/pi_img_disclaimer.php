@@ -30,7 +30,7 @@
         $this->content_width = (int)PI_IMG_DISCLAIMER_CONTENT_WIDTH;
       }
     }
-    
+
     function getOutput() {
       $content_width = $this->content_width;
 
@@ -67,4 +67,3 @@
     }
 
   }
-  

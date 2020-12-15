@@ -21,7 +21,7 @@
     public function execute() {
       if ( (basename($GLOBALS['PHP_SELF']) === 'index.php') && ($GLOBALS['current_category_id'] > 0) ){
         $category_seo_description = $GLOBALS['OSCOM_category']->get($GLOBALS['current_category_id'], 'seo_description');
-        
+
         if (tep_not_null($category_seo_description)) {
           $GLOBALS['oscTemplate']->addBlock('<meta name="description" content="' . tep_output_string($category_seo_description) . '" />' . PHP_EOL, $this->group);
         }
@@ -51,4 +51,3 @@
     }
 
   }
-  

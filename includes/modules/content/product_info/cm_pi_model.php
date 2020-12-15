@@ -19,12 +19,11 @@
     }
 
     function execute() {
-      global $product_info;
+      global $product;
 
-      $content_width = (int)MODULE_CONTENT_PI_MODEL_CONTENT_WIDTH;
-
-      if (tep_not_null($product_info['products_model'])) {
-        $products_model = $product_info['products_model'];
+      $products_model = $product->get('model');
+      if (tep_not_null($products_model)) {
+        $content_width = (int)MODULE_CONTENT_PI_MODEL_CONTENT_WIDTH;
 
         $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
         include 'includes/modules/content/cm_template.php';

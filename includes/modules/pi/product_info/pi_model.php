@@ -30,7 +30,7 @@
         $this->content_width = (int)PI_MODEL_CONTENT_WIDTH;
       }
     }
-    
+
     function getOutput() {
       $content_width = $this->content_width;
 
@@ -70,4 +70,3 @@
     }
 
   }
-  

@@ -19,8 +19,6 @@
     }
 
     function execute() {
-      global $product_info;
-
       $content_width = (int)MODULE_CONTENT_PINF_MESSAGE_CONTENT_WIDTH;
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];

@@ -19,11 +19,11 @@
 
       $display->setPath($GLOBALS['cPath'], '<strong>', '</strong>');
       $display->setMaximumLevel((int)MODULE_BOXES_CATEGORIES_MAX_LEVEL);
-      
+
       $display->setParentGroupString('<div class="list-group list-group-flush">', '</div>', false);
       $display->setChildString('', '');
       $display->setSpacerString('<i class="fas fa-angle-right ml-2 mr-1 text-muted"></i>', 1);
-      
+
       $tpl_data = ['group' => $this->group, 'file' => __FILE__];
       include 'includes/modules/block_template.php';
     }

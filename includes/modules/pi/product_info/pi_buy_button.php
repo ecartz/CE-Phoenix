@@ -30,7 +30,7 @@
         $this->content_width = (int)PI_BUY_CONTENT_WIDTH;
       }
     }
-    
+
     function getOutput() {
       global $product;
 
@@ -71,4 +71,3 @@
     }
 
   }
-  

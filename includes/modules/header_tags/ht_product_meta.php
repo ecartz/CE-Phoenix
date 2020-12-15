@@ -17,10 +17,10 @@
     protected $group = 'header_tags';
 
     function execute() {
-      global $oscTemplate, $product_info;
+      global $product;
 
-      if (isset($_GET['products_id'], $product_info['products_seo_description']) && tep_not_null($product_info['products_seo_description'])) {
-        $oscTemplate->addBlock('<meta name="description" content="' . tep_output_string($product_info['products_seo_description']) . '" />' . PHP_EOL, $this->group);
+      if (isset($_GET['products_id'], $product) && tep_not_null($product->get('seo_description'))) {
+        $GLOBALS['oscTemplate']->addBlock('<meta name="description" content="' . tep_output_string($product->get('seo_description')) . '" />' . PHP_EOL, $this->group);
       }
     }
 

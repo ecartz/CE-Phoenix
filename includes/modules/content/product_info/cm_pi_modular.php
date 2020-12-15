@@ -19,19 +19,19 @@
     }
 
     function execute() {
-      global $oscTemplate, $product_info;
+      global $oscTemplate;
 
       $content_width = (int)MODULE_CONTENT_PI_MODULAR_CONTENT_WIDTH;
-      $slot_array = ['a' => (int)MODULE_CONTENT_PI_MODULAR_A_WIDTH, 
-                     'b' => (int)MODULE_CONTENT_PI_MODULAR_B_WIDTH, 
-                     'c' => (int)MODULE_CONTENT_PI_MODULAR_C_WIDTH, 
-                     'd' => (int)MODULE_CONTENT_PI_MODULAR_D_WIDTH, 
-                     'e' => (int)MODULE_CONTENT_PI_MODULAR_E_WIDTH, 
-                     'f' => (int)MODULE_CONTENT_PI_MODULAR_F_WIDTH, 
-                     'g' => (int)MODULE_CONTENT_PI_MODULAR_G_WIDTH, 
-                     'h' => (int)MODULE_CONTENT_PI_MODULAR_H_WIDTH, 
+      $slot_array = ['a' => (int)MODULE_CONTENT_PI_MODULAR_A_WIDTH,
+                     'b' => (int)MODULE_CONTENT_PI_MODULAR_B_WIDTH,
+                     'c' => (int)MODULE_CONTENT_PI_MODULAR_C_WIDTH,
+                     'd' => (int)MODULE_CONTENT_PI_MODULAR_D_WIDTH,
+                     'e' => (int)MODULE_CONTENT_PI_MODULAR_E_WIDTH,
+                     'f' => (int)MODULE_CONTENT_PI_MODULAR_F_WIDTH,
+                     'g' => (int)MODULE_CONTENT_PI_MODULAR_G_WIDTH,
+                     'h' => (int)MODULE_CONTENT_PI_MODULAR_H_WIDTH,
                      'i' => (int)MODULE_CONTENT_PI_MODULAR_I_WIDTH];
-      
+
       if ( defined('MODULE_CONTENT_PI_INSTALLED') && tep_not_null(MODULE_CONTENT_PI_INSTALLED) ) {
         $pi_array = explode(';', MODULE_CONTENT_PI_INSTALLED);
 
@@ -128,19 +128,19 @@
         ],
       ];
     }
-    
+
     public static function display_layout() {
       if ( defined('MODULE_CONTENT_PI_MODULAR_STATUS') ) {
-        $arr = ['A' => ['s' => MODULE_CONTENT_PI_MODULAR_A_WIDTH, 'c' => '96858f'],  
-                'B' => ['s' => MODULE_CONTENT_PI_MODULAR_B_WIDTH, 'c' => '6d7993'],  
-                'C' => ['s' => MODULE_CONTENT_PI_MODULAR_C_WIDTH, 'c' => '9099a2'],  
-                'D' => ['s' => MODULE_CONTENT_PI_MODULAR_D_WIDTH, 'c' => 'd5d5d5'],   
-                'E' => ['s' => MODULE_CONTENT_PI_MODULAR_E_WIDTH, 'c' => '96858f'],  
-                'F' => ['s' => MODULE_CONTENT_PI_MODULAR_F_WIDTH, 'c' => '6d7993'],   
-                'G' => ['s' => MODULE_CONTENT_PI_MODULAR_G_WIDTH, 'c' => '9099a2'],   
-                'H' => ['s' => MODULE_CONTENT_PI_MODULAR_H_WIDTH, 'c' => 'd5d5d5'],   
+        $arr = ['A' => ['s' => MODULE_CONTENT_PI_MODULAR_A_WIDTH, 'c' => '96858f'],
+                'B' => ['s' => MODULE_CONTENT_PI_MODULAR_B_WIDTH, 'c' => '6d7993'],
+                'C' => ['s' => MODULE_CONTENT_PI_MODULAR_C_WIDTH, 'c' => '9099a2'],
+                'D' => ['s' => MODULE_CONTENT_PI_MODULAR_D_WIDTH, 'c' => 'd5d5d5'],
+                'E' => ['s' => MODULE_CONTENT_PI_MODULAR_E_WIDTH, 'c' => '96858f'],
+                'F' => ['s' => MODULE_CONTENT_PI_MODULAR_F_WIDTH, 'c' => '6d7993'],
+                'G' => ['s' => MODULE_CONTENT_PI_MODULAR_G_WIDTH, 'c' => '9099a2'],
+                'H' => ['s' => MODULE_CONTENT_PI_MODULAR_H_WIDTH, 'c' => 'd5d5d5'],
                 'I' => ['s' => MODULE_CONTENT_PI_MODULAR_I_WIDTH, 'c' => '96858f']];
-                   
+
         $c = 0; $img = null;
         foreach ($arr as $x => $y) {
           $img .= '<span style="color: white; font-weight: bold; font-size: 20px; background: #' . $y['c'] . '; font-family: courier;">' . $x . str_repeat('&nbsp;', $y['s']-1) . '</span>';
@@ -153,9 +153,8 @@
 
         return $img;
       }
-      
+
       return null;
     }
 
   }
-  
