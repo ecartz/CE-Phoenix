@@ -8,6 +8,8 @@
 
   class product_loader extends capabilities_manager {
 
+    protected static $capabilities;
+
     const LISTENER_NAME = 'productCapabilities';
     const CAPABILITIES = [
       'attributes' => 'Product::load_attributes',

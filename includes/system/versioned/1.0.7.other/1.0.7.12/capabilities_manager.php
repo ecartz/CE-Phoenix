@@ -6,7 +6,7 @@
  * @license BSD License; http://www.oscommerce.com/bsdlicense.txt
  */
 
-  class product_loader {
+  abstract class capabilities_manager {
 
     protected static $capabilities;
 
