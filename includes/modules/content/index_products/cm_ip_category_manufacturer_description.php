@@ -19,12 +19,10 @@
     }
 
     function execute() {
-      global $current_category_id, $OSCOM_category, $brand;
-
-      if (($brand ?? null) instanceof manufacturer) {
-        $cm_description = $brand->getData('manufacturers_description');
+      if (($GLOBALS['brand'] ?? null) instanceof manufacturer) {
+        $cm_description = $GLOBALS['brand']->getData('manufacturers_description');
       } else {
-        $cm_description = $OSCOM_category->getData($current_category_id, 'description');
+        $cm_description = $GLOBALS['OSCOM_category']->get($GLOBALS['current_category_id'], 'description');
       }
 
       if (tep_not_null($cm_description)) {

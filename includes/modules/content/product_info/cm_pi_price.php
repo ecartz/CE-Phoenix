@@ -19,16 +19,14 @@
     }
 
     function execute() {
-      global $product_info, $currencies;
+      global $product;
 
-      $content_width = (int)MODULE_CONTENT_PI_PRICE_CONTENT_WIDTH;
-
-      $products_price = $currencies->display_price($product_info['products_price'], tep_get_tax_rate($product_info['products_tax_class_id']));
-      $specials_price = null;
-
-      if ($new_price = tep_get_products_special_price($product_info['products_id'])) {
-        $specials_price = $currencies->display_price($new_price, tep_get_tax_rate($product_info['products_tax_class_id']));
-      }
+      $price = $product->get('is_special')
+             ? sprintf(MODULE_CONTENT_PI_PRICE_DISPLAY_SPECIAL,
+                 $product->format(),
+                 $product->format('price'))
+             : sprintf(MODULE_CONTENT_PI_PRICE_DISPLAY,
+                 $product->format());
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

@@ -23,8 +23,8 @@
 
       $content_width = MODULE_CONTENT_IN_TITLE_CONTENT_WIDTH;
 
-      $category_name  = $OSCOM_category->getData($current_category_id, 'name');
-      $category_image = $OSCOM_category->getData($current_category_id, 'image');
+      $category_name  = $OSCOM_category->get($current_category_id, 'name');
+      $category_image = $OSCOM_category->get($current_category_id, 'image');
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

@@ -45,8 +45,8 @@ EOSQL;
         while (count($categories) > 0) {
           $cPath = implode('_', $categories);
           $category_id = array_pop($categories);
-          if ( ( 'True' !== $this->base_constant('CATEGORY_SEO_OVERRIDE') ) || !tep_not_null($breadcrumb_category = $OSCOM_category->getData($category_id, 'seo_title')) ) {
-            $breadcrumb_category = $OSCOM_category->getData($category_id, 'name');
+          if ( ( 'True' !== $this->base_constant('CATEGORY_SEO_OVERRIDE') ) || !tep_not_null($breadcrumb_category = $OSCOM_category->get($category_id, 'seo_title')) ) {
+            $breadcrumb_category = $OSCOM_category->get($category_id, 'name');
           }
 
           $breadcrumb->prepend($breadcrumb_category, tep_href_link('index.php', 'cPath=' . $cPath));
