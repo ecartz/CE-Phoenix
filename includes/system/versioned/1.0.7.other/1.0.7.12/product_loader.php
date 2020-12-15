@@ -21,6 +21,7 @@
       'notify' => 'Product::load_notify',
       'review_rating' => 'Product::load_reviews',
       'reviews' => 'Product::load_reviews',
+      'tax_rate' => 'Product::load_tax_rate',
     ];
 
     public static function build_link($product, $parameters = '') {
@@ -45,7 +46,7 @@
         $language_id = $_SESSION['languages_id'];
       }
 
-      $product_id = is_numeric($product) ? $product : $product->get('id');
+      $product_id = (is_numeric($product) || is_string($product)) ? $product : $product->get('id');
 
       $product_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$product_id . " AND language_id = " . (int)$language_id);
       $product = tep_db_fetch_array($product_query);
@@ -56,7 +57,7 @@
     public static function load_attributes($product, $language_id = null) {
       $attributes_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT po.products_options_name, pov.products_options_values_name,
-   pa.options_id, pa.options_values_id, pa.price_prefix, pa.options_values_price
+   pa.options_id, pa.options_values_id, pa.price_prefix, pa.options_values_price,
    pad.products_attributes_filename, pad.products_attributes_maxdays, pad.products_attributes_maxcount
  FROM products_options po
   INNER JOIN products_attributes pa ON po.products_options_id = pa.options_id
@@ -86,20 +87,16 @@ EOSQL
         ];
       }
 
-      if (count($attributes) > 0) {
-        
-      }
-
       $product->set('has_attributes', (count($attributes) > 0) ? '1' : '0');
       $product->set('attributes', $attributes);
       return $attributes;
     }
 
     public static function load_brand($product) {
-      if (isset($GLOBALS['brand']) && ($GLOBALS['brand']->getData('manufacturers_id') == $product->get('manufacturer_id'))) {
+      if (isset($GLOBALS['brand']) && ($GLOBALS['brand']->getData('manufacturers_id') == $product->get('manufacturers_id'))) {
         $product->_data['brand'] =& $GLOBALS['brand'];
       } else {
-        $product->set('brand', new manufacturer($product->get('manufacturer_id')));
+        $product->set('brand', new manufacturer($product->get('manufacturers_id')));
       }
 
       return $product->get('brand');
@@ -173,10 +170,16 @@ EOSQL
         $reviews[] = $review;
       }
 
-      $product->set('review_rating', number_format(count($reviews) ? ($sum / count($reviews)) : 0, 2));
+      $product->set('review_rating',
+        number_format(count($reviews) ? ($sum / count($reviews)) : 0, 2));
       $product->set('reviews', $reviews);
 
       return $reviews;
+    }
+
+    public static function load_tax_rate($product) {
+      $product->set('tax_rate', tep_get_tax_rate($product->get('tax_class_id')));
+      return $product->get('tax_rate');
     }
 
   }

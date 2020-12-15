@@ -19,35 +19,19 @@
     }
 
     public function execute() {
-      global $oscTemplate, $product_info;
+      global $product, $oscTemplate;
 
       $content_width = (int)MODULE_CONTENT_PI_GALLERY_CONTENT_WIDTH;
       $thumbnail_width = MODULE_CONTENT_PI_GALLERY_CONTENT_WIDTH_EACH;
 
       $pi_image = $pi_thumb = null;
 
-      if (tep_not_null($product_info['products_image'])) {
-        $album_name = sprintf(MODULE_CONTENT_PI_GALLERY_ALBUM_NAME, $product_info['products_name']);
+      if (tep_not_null($product->get('image'))) {
+        $active_image = ['image' => $product->get('image'), 'htmlcontent' => $product->get('name')];
+        $other_images = $product->get('images');
+
+        $album_name = sprintf(MODULE_CONTENT_PI_GALLERY_ALBUM_NAME, $product->get('name'));
         $album_exit = MODULE_CONTENT_PI_GALLERY_ALBUM_CLOSE;
-
-        $pi_html = [];
-        $pi_html[0] = ['image' => $product_info['products_image'], 'htmlcontent' => $product_info['products_name']];
-
-        $pi_query = tep_db_query("select image, htmlcontent from products_images where products_id = '" . (int)$product_info['products_id'] . "' order by sort_order");
-        $pi_total = tep_db_num_rows($pi_query);
-
-        if ($pi_total > 0) {
-          $pi_counter = 1;
-
-          while ($pi = tep_db_fetch_array($pi_query)) {
-            $pi_html[$pi_counter] = $pi;
-
-            $pi_counter++;
-          }
-        }
-
-        $active_image = array_shift($pi_html);
-        $other_images = $pi_html;
 
         $modal_size = MODULE_CONTENT_PI_GALLERY_MODAL_SIZE;
 

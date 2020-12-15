@@ -18,12 +18,6 @@
     }
 
     public function get_children($id) {
-      if ('' === $id) {
-        ob_start();
-        debug_print_backtrace();
-        error_log(ob_get_clean());
-        return [];
-      }
       return array_keys($this->_data[$id] ?? []);
     }
 

@@ -19,11 +19,9 @@
     }
 
     function execute() {
-      global $product_info;
-
       $content_width = (int)MODULE_CONTENT_PI_NAME_CONTENT_WIDTH;
 
-      $products_name = $product_info['products_name'];
+      $products_name = $GLOBALS['product']->get('name');
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

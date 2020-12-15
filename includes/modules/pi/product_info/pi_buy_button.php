@@ -32,12 +32,11 @@
     }
     
     function getOutput() {
-      global $product_info;
-      
-      $products_attributes_query = tep_db_query("select count(*) as total from products_options popt, products_attributes patrib where patrib.products_id='" . (int)$_GET['products_id'] . "' and patrib.options_id = popt.products_options_id and popt.language_id = '" . (int)$_SESSION['languages_id'] . "'");
-      $products_attributes = tep_db_fetch_array($products_attributes_query);
-      
-      $content_width = $this->content_width;
+      global $product;
+
+      $data_attributes = 'data-has-attributes="' . (int)$product->get('has_attributes')
+                       . '" data-in-stock="' . (int)$product->get('in_stock')
+                       . '" data-product-id="' . (int)$product->get('id') . '"';
 
       $tpl_data = ['group' => $this->group, 'file' => __FILE__];
       include 'includes/modules/block_template.php';

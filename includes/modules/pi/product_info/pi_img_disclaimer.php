@@ -32,8 +32,6 @@
     }
     
     function getOutput() {
-      global $product_info;
-      
       $content_width = $this->content_width;
 
       $tpl_data = ['group' => $this->group, 'file' => __FILE__];

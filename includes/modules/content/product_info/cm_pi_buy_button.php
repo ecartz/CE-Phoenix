@@ -19,17 +19,11 @@
     }
 
     function execute() {
-      global $product_info;
+      global $product;
 
-      $products_attributes_query = tep_db_query(<<<'EOSQL'
-SELECT COUNT(*) AS total
- FROM products_options popt INNER JOIN products_attributes patrib ON patrib.options_id = popt.products_options_id
- WHERE patrib.products_id=
-EOSQL
-        . (int)$_GET['products_id'] . " AND popt.language_id = " . (int)$_SESSION['languages_id']);
-      $products_attributes = tep_db_fetch_array($products_attributes_query);
-
-      $content_width = (int)MODULE_CONTENT_PI_BUY_CONTENT_WIDTH;
+      $data_attributes = 'data-has-attributes="' . (int)$product->get('has_attributes')
+                       . '" data-in-stock="' . (int)$product->get('in_stock')
+                       . '" data-product-id="' . (int)$product->get('id') . '"';
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

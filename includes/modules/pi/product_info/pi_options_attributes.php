@@ -32,17 +32,10 @@
     }
 
     function getOutput() {
-      global $currencies, $product_info;
+      global $currencies, $product;
 
-      $products_options_name_query = tep_db_query(sprintf(<<<'EOSQL'
-SELECT DISTINCT po.products_options_id, po.products_options_name
-  FROM products_options po INNER JOIN products_attributes patrib ON patrib.options_id = po.products_options_id
-  WHERE patrib.products_id = %d AND po.language_id = %d
-  ORDER BY po.sort_order, po.products_options_name
-EOSQL
-        , (int)$_GET['products_id'], (int)$_SESSION['languages_id']));
-
-      if (tep_db_num_rows($products_options_name_query)) {
+      $attributes = $product->get('attributes');
+      if (count($attributes)) {
         $content_width = (int)PI_OA_CONTENT_WIDTH;
 
         $fr_input = $fr_required = '';
@@ -51,48 +44,41 @@ EOSQL
           $fr_required = 'required aria-required="true" ';
         }
 
-        $tax_rate = tep_get_tax_rate($product_info['products_tax_class_id']);
+        $tax_rate = tep_get_tax_rate($product->get('tax_class_id'));
 
         $options = [];
-        while ($products_options_name = tep_db_fetch_array($products_options_name_query)) {
+        foreach ($attributes as $option_id => $option) {
           $choices = [];
 
           if (PI_OA_HELPER == 'True') {
             $choices[] = ['id' => '', 'text' => PI_OA_ENFORCE_SELECTION];
           }
 
-          $products_options_query = tep_db_query(sprintf(<<<'EOSQL'
-SELECT pov.*, pa.*
- FROM products_attributes pa INNER JOIN products_options_values pov ON pa.options_values_id = pov.products_options_values_id
- WHERE pa.products_id = %d AND pa.options_id = %d AND pov.language_id = %d
- ORDER BY pov.sort_order, pov.products_options_values_name
-EOSQL
-            , (int)$_GET['products_id'], (int)$products_options_name['products_options_id'], (int)$_SESSION['languages_id']));
-          while ($products_options = tep_db_fetch_array($products_options_query)) {
-            $text = $products_options['products_options_values_name'];
-            if ($products_options['options_values_price'] != '0') {
-              $text .= ' (' . $products_options['price_prefix']
-                     . $currencies->display_price($products_options['options_values_price'], $tax_rate)
+          foreach ($option['values'] as $value_id => $value) {
+            $text = $value['name'];
+            if ($value['price'] != '0') {
+              $text .= ' (' . $value['prefix']
+                     . $currencies->display_price($value['price'], $tax_rate)
                      . ') ';
             }
 
-            $choices[] = ['id' => $products_options['products_options_values_id'], 'text' => $text];
+            $choices[] = ['id' => $value_id, 'text' => $text];
           }
 
           if (is_string($_GET['products_id'])) {
-            $selected_attribute = $_SESSION['cart']->contents[$_GET['products_id']]['attributes'][$products_options_name['products_options_id']] ?? false;
+            $selected_attribute = $_SESSION['cart']->contents[$_GET['products_id']]['attributes'][$option_id] ?? false;
           } else {
             $selected_attribute = false;
           }
 
           $options[] = [
-            'id' => $products_options_name['products_options_id'],
-            'name' => $products_options_name['products_options_name'],
+            'id' => $option_id,
+            'name' => $option['name'],
             'menu' => tep_draw_pull_down_menu(
-                        'id[' . $products_options_name['products_options_id'] . ']',
+                        'id[' . $option_id . ']',
                         $choices,
                         $selected_attribute,
-                        $fr_required . 'id="input_' . $products_options_name['products_options_id'] . '"'
+                        $fr_required . 'id="input_' . $option_id . '"'
                       ),
           ];
         }

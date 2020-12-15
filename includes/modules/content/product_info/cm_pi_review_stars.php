@@ -19,22 +19,20 @@
     }
 
     function execute() {
-      global $product_info;
+      global $product;
 
-      $pid = (int)$product_info['products_id'];
+      $pid = (int)$product->get('id');
       $review_link = tep_href_link('ext/modules/content/reviews/write.php', "products_id=$pid");
 
-      $review_average_query = tep_db_query("SELECT AVG(reviews_rating) AS average, COUNT(reviews_rating) AS count FROM reviews WHERE products_id = " . $pid . " and reviews_status = 1");
-      $review_average = tep_db_fetch_array($review_average_query);
-
       $review_stars_array = [];
-      if ($review_average['count'] > 0) {
-        $review_stars_array[] = tep_draw_stars((int)$review_average['average']);
+      $review_count = count($product->get('reviews'));
+      if ($review_count > 0) {
+        $review_stars_array[] = tep_draw_stars((int)$product->get('review_rating'));
 
-        if ((int)$review_average['count'] == 1) {
-          $review_stars_array[] = sprintf(MODULE_CONTENT_PI_REVIEW_STARS_COUNT_ONE, (int)$review_average['count']);
+        if (1 === (int)$review_count) {
+          $review_stars_array[] = sprintf(MODULE_CONTENT_PI_REVIEW_STARS_COUNT_ONE, (int)$review_count);
         } else {
-          $review_stars_array[] = sprintf(MODULE_CONTENT_PI_REVIEW_STARS_COUNT, (int)$review_average['count']);
+          $review_stars_array[] = sprintf(MODULE_CONTENT_PI_REVIEW_STARS_COUNT, (int)$review_count);
         }
 
         $do_review = MODULE_CONTENT_PI_REVIEW_STARS_DO_REVIEW;

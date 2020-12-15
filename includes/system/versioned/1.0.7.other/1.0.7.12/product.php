@@ -64,11 +64,11 @@
     }
 
     public function format($price = 'final_price') {
-      return $GLOBALS['currencies']->display_price($this->get($price), tep_get_tax_rate($this->get('tax_class_id')));
+      return $GLOBALS['currencies']->display_price($this->get($price), $this->get('tax_rate'));
     }
 
     public function format_raw($price = 'final_price') {
-      return $GLOBALS['currencies']->display_raw($this->get($price), tep_get_tax_rate($this->get('tax_class_id')));
+      return $GLOBALS['currencies']->display_raw($this->get($price), $this->get('tax_rate'));
     }
 
     public function increment_view_count() {
