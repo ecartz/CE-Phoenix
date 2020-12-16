@@ -24,8 +24,7 @@
       switch (basename($PHP_SELF)) {
         case 'index.php':
           if (isset($cPath) && tep_not_null($cPath) && ($current_category_id > 0) && ($GLOBALS['category_depth'] != 'top')) {
-            $display_tree = new display_tree($GLOBALS['OSCOM_category']);
-            $canonical = $display_tree->buildBreadcrumb($current_category_id);
+            $canonical = Guarantor::ensure_global('category_tree')->find_path($current_category_id);
 
             return tep_href_link('index.php', 'view=all&cPath=' . $canonical, 'SSL', false);
           } elseif (isset($_GET['manufacturers_id']) && tep_not_null($_GET['manufacturers_id'])) {

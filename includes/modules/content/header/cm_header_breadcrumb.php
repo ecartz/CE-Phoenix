@@ -19,7 +19,7 @@
     }
 
     public function execute() {
-      global $breadcrumb, $cPath_array, $OSCOM_category, $brand;
+      global $breadcrumb, $cPath_array, $category_tree, $brand;
 
       // add the products model to the breadcrumb trail
       if (isset($_GET['products_id'])) {
@@ -45,8 +45,8 @@ EOSQL;
         while (count($categories) > 0) {
           $cPath = implode('_', $categories);
           $category_id = array_pop($categories);
-          if ( ( 'True' !== $this->base_constant('CATEGORY_SEO_OVERRIDE') ) || !tep_not_null($breadcrumb_category = $OSCOM_category->get($category_id, 'seo_title')) ) {
-            $breadcrumb_category = $OSCOM_category->get($category_id, 'name');
+          if ( ( 'True' !== $this->base_constant('CATEGORY_SEO_OVERRIDE') ) || !tep_not_null($breadcrumb_category = $category_tree->get($category_id, 'seo_title')) ) {
+            $breadcrumb_category = $category_tree->get($category_id, 'name');
           }
 
           $breadcrumb->prepend($breadcrumb_category, tep_href_link('index.php', 'cPath=' . $cPath));

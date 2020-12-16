@@ -86,20 +86,11 @@
       return $result;
     }
 
-    public function buildBreadcrumb($id, $level = 0) {
-      if (null === $id) {
-        error_log("Id: [$id]");
-        ob_start();
-        debug_print_backtrace();
-        error_log(ob_get_clean());
-        return '';
-      }
-      $parent = $this->tree->get_parent_id($id);
-      return ($this->tree->get_root_id() == $parent)
-             ? $id
-             : $this->buildBreadcrumb($parent, $level+1)
-               . $this->breadcrumb_separator
-               . $id;
+    public function buildBreadcrumb($id, $level = null) {
+      $ancestors = array_reverse($this->tree->get_ancestors($id));
+      $ancestors[] = $id;
+
+      return implode($this->breadcrumb_separator, $ancestors);
     }
 
 /**
