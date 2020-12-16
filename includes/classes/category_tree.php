@@ -44,4 +44,20 @@ EOSQL
       return tep_href_link('index.php', 'cPath=' . $path);
     }
 
+    public function get_selections($categories = [], $parent_id = '0', $indent = '') {
+      if (!is_array($categories)) {
+        $categories = [];
+      }
+
+      $category_tree =& Guarantor::ensure_globals('category_tree');
+      foreach ($category_tree->get_descendants($parent_id) as $category_id) {
+        $categories[] = [
+          'id' => $category_id,
+          'text' => $indent . $category_tree->get($category_id, 'name'),
+        ];
+      }
+
+      return $categories;
+    }
+
   }

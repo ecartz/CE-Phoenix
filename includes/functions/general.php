@@ -71,6 +71,7 @@
 ////
 // Return a random row from a database query
   function tep_random_select($query) {
+    trigger_error('The tep_random_select function has been deprecated.', E_USER_DEPRECATED);
     $random_product = '';
     $random_query = tep_db_query($query);
     $num_rows = tep_db_num_rows($random_query);
@@ -85,20 +86,17 @@
 
 ////
 // Return a product's name
-// TABLES: products
   function tep_get_products_name($product_id, $language_id = null) {
-    if (empty($language_id)) $language_id = $_SESSION['languages_id'];
+    trigger_error('The tep_get_products_name function has been deprecated.', E_USER_DEPRECATED);
 
-    $product_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$product_id . " AND language_id = " . (int)$language_id);
-    $product = tep_db_fetch_array($product_query);
-
-    return $product['products_name'];
+    return Product::fetch_name($product_id, $language_id);
   }
 
 ////
 // Return a product's special price (returns nothing if there is no offer)
 // TABLES: products
   function tep_get_products_special_price($product_id) {
+    trigger_error('The tep_get_products_special_price function has been deprecated.', E_USER_DEPRECATED);
     $product_query = tep_db_query("SELECT specials_new_products_price FROM specials WHERE products_id = " . (int)$product_id . " AND status = 1");
     $product = tep_db_fetch_array($product_query);
 
@@ -271,9 +269,9 @@
     if ( ($country_id == -1) && ($zone_id == -1) ) {
       global $customer;
 
-      if (isset($customer) && is_object($customer) && is_a($customer, 'customer')) {
-        $country_id = $customer->get_country_id();
-        $zone_id = $customer->get_zone_id();
+      if (isset($customer) && ($customer instanceof customer)) {
+        $country_id = $customer->get('country_id');
+        $zone_id = $customer->get('zone_id');
       } else {
         $country_id = STORE_COUNTRY;
         $zone_id = STORE_ZONE;
@@ -281,7 +279,7 @@
     }
 
     if (!isset($tax_rates[$class_id][$country_id][$zone_id]['rate'])) {
-      $tax_query = tep_db_query("SELECT sum(tax_rate) AS tax_rate FROM tax_rates tr LEFT JOIN zones_to_geo_zones za ON (tr.tax_zone_id = za.geo_zone_id) LEFT JOIN geo_zones tz ON (tz.geo_zone_id = tr.tax_zone_id) WHERE (za.zone_country_id is null or za.zone_country_id = '0' or za.zone_country_id = " . (int)$country_id . ") AND (za.zone_id is null or za.zone_id = '0' or za.zone_id = " . (int)$zone_id . ") AND tr.tax_class_id = " . (int)$class_id . " group by tr.tax_priority");
+      $tax_query = tep_db_query("SELECT SUM(tax_rate) AS tax_rate FROM tax_rates tr LEFT JOIN zones_to_geo_zones za ON (tr.tax_zone_id = za.geo_zone_id) LEFT JOIN geo_zones tz ON (tz.geo_zone_id = tr.tax_zone_id) WHERE (za.zone_country_id is null or za.zone_country_id = '0' or za.zone_country_id = " . (int)$country_id . ") AND (za.zone_id is null or za.zone_id = '0' or za.zone_id = " . (int)$zone_id . ") AND tr.tax_class_id = " . (int)$class_id . " group by tr.tax_priority");
       if (tep_db_num_rows($tax_query)) {
         $tax_multiplier = 1.0;
         while ($tax = tep_db_fetch_array($tax_query)) {
@@ -336,22 +334,18 @@
     return $price * $tax / 100;
   }
 
-  function tep_get_categories($categories_array = '', $parent_id = '0', $indent = '') {
-    if (!is_array($categories_array)) $categories_array = [];
+  function tep_get_categories($categories = [], $parent_id = '0', $indent = '') {
+    if (!is_array($categories)) $categories = [];
 
-    $categories_query = tep_db_query("SELECT c.categories_id, cd.categories_name FROM categories c, categories_description cd WHERE parent_id = " . (int)$parent_id . " AND c.categories_id = cd.categories_id AND cd.language_id = " . (int)$_SESSION['languages_id'] . " ORDER BY sort_order, cd.categories_name");
-    while ($categories = tep_db_fetch_array($categories_query)) {
-      $categories_array[] = [
-        'id' => $categories['categories_id'],
-        'text' => $indent . $categories['categories_name'],
+    $category_tree =& Guarantor::ensure_globals('category_tree');
+    foreach ($category_tree->get_descendants($parent_id) as $category_id) {
+      $categories[] = [
+        'id' => $category_id,
+        'text' => $indent . $category_tree->get($category_id, 'name'),
       ];
-
-      if ($categories['categories_id'] != $parent_id) {
-        $categories_array = tep_get_categories($categories_array, $categories['categories_id'], $indent . '&nbsp;&nbsp;');
-      }
     }
 
-    return $categories_array;
+    return $categories;
   }
 
   function tep_get_manufacturers($manufacturers = []) {
@@ -365,15 +359,10 @@
 
 ////
 // Return all subcategory IDs
-// TABLES: categories
-  function tep_get_subcategories(&$subcategories_array, $parent_id = 0) {
-    $subcategories_query = tep_db_query("SELECT categories_id FROM categories WHERE parent_id = " . (int)$parent_id);
-    while ($subcategories = tep_db_fetch_array($subcategories_query)) {
-      $subcategories_array[] = $subcategories['categories_id'];
-      if ($subcategories['categories_id'] != $parent_id) {
-        tep_get_subcategories($subcategories_array, $subcategories['categories_id']);
-      }
-    }
+  function tep_get_subcategories(&$descendants, $parent_id = 0) {
+    $descendants = array_merge(
+      $descendants,
+      Guarantor::ensure_globals('category_tree')->get_descendants($parent_id));
   }
 
 // Output a raw date string in the selected locale date format
@@ -579,110 +568,31 @@
   }
 
 ////
-// Recursively go through the categories and retrieve all parent categories IDs
-// TABLES: categories
+// Retrieve all parent categories IDs
   function tep_get_parent_categories(&$categories, $categories_id) {
-    $parent_categories_query = tep_db_query("SELECT parent_id FROM categories WHERE categories_id = " . (int)$categories_id);
-    while ($parent_categories = tep_db_fetch_array($parent_categories_query)) {
-      if ($parent_categories['parent_id'] == 0) return true;
-      $categories[count($categories)] = $parent_categories['parent_id'];
-      if ($parent_categories['parent_id'] != $categories_id) {
-        tep_get_parent_categories($categories, $parent_categories['parent_id']);
-      }
-    }
+    trigger_error('The tep_get_parent_categories function has been deprecated.', E_USER_DEPRECATED);
+    array_merge($categories, Guarantor::ensure_globals('category_tree')->get_ancestors($categories_id));
   }
 
 ////
 // Construct a category path to the product
-// TABLES: products_to_categories
   function tep_get_product_path($products_id) {
-    $cPath = '';
+    trigger_error('The tep_get_parent_categories function has been deprecated.', E_USER_DEPRECATED);
 
-    $category_query = tep_db_query("SELECT p2c.categories_id FROM products p, products_to_categories p2c WHERE p.products_id = " . (int)$products_id . " AND p.products_status = 1 AND p.products_id = p2c.products_id LIMIT 1");
-    if (tep_db_num_rows($category_query)) {
-      $category = tep_db_fetch_array($category_query);
-
-      $categories = [];
-      tep_get_parent_categories($categories, $category['categories_id']);
-
-      $categories = array_reverse($categories);
-
-      $cPath = implode('_', $categories);
-
-      if (tep_not_null($cPath)) $cPath .= '_';
-      $cPath .= $category['categories_id'];
-    }
-
-    return $cPath;
+    $product = product_by_id($products_id);
+    return $product->get('status') ? $product->find_path() : '';
   }
 
 ////
 // Return a product ID with attributes
   function tep_get_uprid($prid, $params) {
-    if (is_numeric($prid)) {
-      $uprid = (int)$prid;
-
-      if (is_array($params) && (count($params) > 0)) {
-        $attributes_check = true;
-        $attributes_ids = '';
-
-        foreach($params as $option => $value) {
-          if (is_numeric($option) && is_numeric($value)) {
-            $attributes_ids .= '{' . (int)$option . '}' . (int)$value;
-          } else {
-            $attributes_check = false;
-            break;
-          }
-        }
-
-        if ($attributes_check == true) {
-          $uprid .= $attributes_ids;
-        }
-      }
-    } else {
-      $uprid = tep_get_prid($prid);
-
-      if (is_numeric($uprid)) {
-        if (strpos($prid, '{') !== false) {
-          $attributes_check = true;
-          $attributes_ids = '';
-
-// strpos()+1 to remove up to and including the first { which would create an empty array element in explode()
-          $attributes = explode('{', substr($prid, strpos($prid, '{')+1));
-
-          foreach ($attributes as $attribute) {
-            $pair = explode('}', $attribute);
-
-            if (is_numeric($pair[0]) && is_numeric($pair[1])) {
-              $attributes_ids .= '{' . (int)$pair[0] . '}' . (int)$pair[1];
-            } else {
-              $attributes_check = false;
-              break;
-            }
-          }
-
-          if ($attributes_check == true) {
-            $uprid .= $attributes_ids;
-          }
-        }
-      } else {
-        return false;
-      }
-    }
-
-    return $uprid;
+    return Product::build_uprid($prid, $params);
   }
 
 ////
 // Return a product ID from a product ID with attributes
   function tep_get_prid($uprid) {
-    $pieces = explode('{', $uprid);
-
-    if (is_numeric($pieces[0])) {
-      return (int)$pieces[0];
-    } else {
-      return false;
-    }
+    return Product::build_prid($uprid);
   }
 
 ////
@@ -873,9 +783,9 @@
 
 ////
 // Parse and secure the cPath parameter values
-  function tep_parse_category_path($cPath) {
 // make sure the category IDs are integers
 // make sure no duplicate category IDs exist which could lock the server in a loop
+  function tep_parse_category_path($cPath) {
     return array_unique(array_map(function ($s) { return (int)$s; }, explode('_', $cPath)), SORT_NUMERIC);
   }
 

@@ -19,7 +19,7 @@
       if (!is_null($notify)) {
         foreach ((array)$notify as $product_id) {
           tep_db_query("INSERT IGNORE INTO products_notifications (products_id, customers_id, date_added) VALUES (" . (int)$product_id . ", " . (int)$_SESSION['customer_id'] . ", NOW())");
-          $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_SUBSCRIBED, Product::load_name((int)$product_id)), 'success');
+          $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_SUBSCRIBED, Product::fetch_name((int)$product_id)), 'success');
         }
       }
 

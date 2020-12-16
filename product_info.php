@@ -18,7 +18,6 @@
 
   require language::map_to_translation('product_info.php');
 
-  $product = product_by_id::build((int)$_GET['products_id']);
   if ($product->get('status')) {
     $product->increment_view_count();
 

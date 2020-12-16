@@ -16,7 +16,7 @@
       if (isset($_GET['products_id'])) {
         $_SESSION['cart']->remove($_GET['products_id']);
 
-        $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_REMOVED, Product::load_name($_GET['products_id'])), 'warning');
+        $GLOBALS['messageStack']->add_session('product_action', sprintf(PRODUCT_REMOVED, Product::fetch_name($_GET['products_id'])), 'warning');
       }
 
       tep_redirect(tep_href_link($GLOBALS['goto'], tep_get_all_get_params($GLOBALS['parameters'])));

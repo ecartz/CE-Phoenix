@@ -24,36 +24,6 @@
       'tax_rate' => 'Product::load_tax_rate',
     ];
 
-    public static function build_link($product, $parameters = '') {
-      $product_id = is_numeric($product) ? $product : $product->get('id');
-      return tep_href_link('product_info.php', "{$parameters}products_id=" . (int)$product_id);
-    }
-
-    public static function build_data_attributes($product, $data = []) {
-      $data['data-is-special'] = $product->get('is_special');
-      $data['data-product-price'] = $product->format_raw();
-      $data['data-product-manufacturer'] = $product->get('manufacturers_id');
-
-      $product->set('data-attributes', implode(array_map(function ($key, $value) {
-        return ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
-      }, array_keys($data), $data)));
-
-      return $product->get('data-attributes');
-    }
-
-    public static function load_name($product, $language_id = null) {
-      if (empty($language_id)) {
-        $language_id = $_SESSION['languages_id'];
-      }
-
-      $product_id = (is_numeric($product) || is_string($product)) ? $product : $product->get('id');
-
-      $product_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$product_id . " AND language_id = " . (int)$language_id);
-      $product = tep_db_fetch_array($product_query);
-
-      return $product['products_name'];
-    }
-
     public static function load_attributes($product, $language_id = null) {
       $attributes_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT po.products_options_name, pov.products_options_values_name,
@@ -112,9 +82,7 @@ EOSQL
 
       $categories = [];
       while ($category = tep_db_fetch_array($categories_query)) {
-        $categories[] = [
-          'category_id' => $category['categories_id'],
-        ];
+        $categories[] = $category['categories_id'];
       }
 
       $product->set('categories', $categories);
@@ -179,8 +147,17 @@ EOSQL
     }
 
     public static function load_tax_rate($product) {
-      $product->set('tax_rate', tep_get_tax_rate($product->get('tax_class_id')));
-      return $product->get('tax_rate');
+      if (isset($GLOBALS['customer'])) {
+        $tax_rate = tep_get_tax_rate(
+          $product->get('tax_class_id'),
+          $GLOBALS['customer']->get_country_id(),
+          $GLOBALS['customer']->get_zone_id());
+      } else {
+        $tax_rate = tep_get_tax_rate($product->get('tax_class_id'));
+      }
+
+      $product->set('tax_rate', $tax_rate);
+      return $tax_rate;
     }
 
   }

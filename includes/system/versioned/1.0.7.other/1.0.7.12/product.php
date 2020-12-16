@@ -6,7 +6,7 @@
  * @license BSD License; http://www.oscommerce.com/bsdlicense.txt
  */
 
-  class Product extends product_loader {
+  class Product extends product_builder {
 
     protected $_data = [];
 
@@ -73,6 +73,12 @@
 
     public function increment_view_count() {
       tep_db_query("UPDATE products_description SET products_viewed = products_viewed+1 WHERE products_id = " . (int)$this->get('id') . " AND language_id = " . (int)$_SESSION['languages_id']);
+    }
+
+    public function find_path() {
+      return (($categories = $this->get('categories')) && isset($categories[0]))
+           ? Guarantor::ensure_globals('category_tree')->find_path($categories[0])
+           : '';
     }
 
   }

@@ -14,22 +14,24 @@
 
     const CONFIG_KEY_BASE = 'MODULE_BOXES_PRODUCT_NOTIFICATIONS_';
 
-    function execute() {
+    protected function has_notification() {
+      if (!isset($_SESSION['customer_id'])) {
+        return false;
+      }
+
+      $check_query = tep_db_query("SELECT COUNT(*) AS `count` FROM products_notifications WHERE products_id = " . (int)$_GET['products_id'] . " AND customers_id = " . (int)$_SESSION['customer_id']);
+      $check = tep_db_fetch_array($check_query);
+
+      return ($check['count'] > 0);
+    }
+
+    public function execute() {
       if (isset($_GET['products_id'])) {
-        if (isset($_SESSION['customer_id'])) {
-          $check_query = tep_db_query("SELECT COUNT(*) AS `count` FROM products_notifications WHERE products_id = " . (int)$_GET['products_id'] . " AND customers_id = " . (int)$_SESSION['customer_id']);
-          $check = tep_db_fetch_array($check_query);
-
-          $notification_exists = ($check['count'] > 0);
-        } else {
-          $notification_exists = false;
-        }
-
         $notification = [
-          'link' => tep_href_link($GLOBALS['PHP_SELF'], tep_get_all_get_params(['action']) . 'action=' . ($notification_exists ? 'notify_remove' : 'notify')),
+          'link' => tep_href_link($GLOBALS['PHP_SELF'], tep_get_all_get_params(['action']) . 'action=' . ($this->has_notification() ? 'notify_remove' : 'notify')),
           'message' => sprintf(
             $notification_exists ? MODULE_BOXES_PRODUCT_NOTIFICATIONS_BOX_NOTIFY_REMOVE : MODULE_BOXES_PRODUCT_NOTIFICATIONS_BOX_NOTIFY,
-            Product::load_name($_GET['products_id'])),
+            $GLOBALS['product']->get('name')),
         ];
 
         $tpl_data = ['group' => $this->group, 'file' => __FILE__];

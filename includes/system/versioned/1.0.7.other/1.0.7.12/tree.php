@@ -30,6 +30,25 @@
       return $results;
     }
 
+    public function get_ancestors($id, &$results = []) {
+      while (($id = $this->get_parent_id($id)) && ($id != $this->root_id)) {
+        $results[] = $id;
+      }
+
+      return $results;
+    }
+
+    public function find_path($id, $glue = '_') {
+      $nodes = array_reverse($this->get_ancestors($id));
+      $nodes[] = $id;
+
+      return implode($glue, $nodes);
+    }
+
+    public function parse_path($path) {
+      return array_unique(array_map('intval', explode('_', $path)), SORT_NUMERIC);
+    }
+
 /**
  * Return node information
  *
