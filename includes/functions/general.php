@@ -337,7 +337,7 @@
   function tep_get_categories($categories = [], $parent_id = '0', $indent = '') {
     if (!is_array($categories)) $categories = [];
 
-    $category_tree =& Guarantor::ensure_globals('category_tree');
+    $category_tree =& Guarantor::ensure_global('category_tree');
     foreach ($category_tree->get_descendants($parent_id) as $category_id) {
       $categories[] = [
         'id' => $category_id,
@@ -362,7 +362,7 @@
   function tep_get_subcategories(&$descendants, $parent_id = 0) {
     $descendants = array_merge(
       $descendants,
-      Guarantor::ensure_globals('category_tree')->get_descendants($parent_id));
+      Guarantor::ensure_global('category_tree')->get_descendants($parent_id));
   }
 
 // Output a raw date string in the selected locale date format
@@ -571,7 +571,7 @@
 // Retrieve all parent categories IDs
   function tep_get_parent_categories(&$categories, $categories_id) {
     trigger_error('The tep_get_parent_categories function has been deprecated.', E_USER_DEPRECATED);
-    array_merge($categories, Guarantor::ensure_globals('category_tree')->get_ancestors($categories_id));
+    array_merge($categories, Guarantor::ensure_global('category_tree')->get_ancestors($categories_id));
   }
 
 ////

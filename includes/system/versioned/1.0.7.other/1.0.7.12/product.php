@@ -77,7 +77,7 @@
 
     public function find_path() {
       return (($categories = $this->get('categories')) && isset($categories[0]))
-           ? Guarantor::ensure_globals('category_tree')->find_path($categories[0])
+           ? Guarantor::ensure_global('category_tree')->find_path($categories[0])
            : '';
     }
 

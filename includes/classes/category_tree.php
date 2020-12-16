@@ -49,7 +49,7 @@ EOSQL
         $categories = [];
       }
 
-      $category_tree =& Guarantor::ensure_globals('category_tree');
+      $category_tree =& Guarantor::ensure_global('category_tree');
       foreach ($category_tree->get_descendants($parent_id) as $category_id) {
         $categories[] = [
           'id' => $category_id,

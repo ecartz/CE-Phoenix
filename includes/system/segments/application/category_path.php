@@ -16,13 +16,14 @@
 
 // calculate category path
   if (isset($_GET['cPath'])) {
-    $cPath_array = Guarantor::ensure_globals('category_tree')->parse_path($_GET['cPath']);
+    $cPath_array = Guarantor::ensure_global('category_tree')->parse_path($_GET['cPath']);
     $current_category_id = end($cPath_array);
   } elseif (isset($_GET['manufacturers_id'])) {
     $brand = new manufacturer((int)$_GET['manufacturers_id']);
   } elseif (isset($product) && $product->get('status')) {
     $current_category_id = $product->get('categories')[0] ?? 0;
-    $cPath_array = array_reverse(Guarantor::ensure_globals('category_tree')->get_ancestors($id));
+    $cPath_array = array_reverse(
+      Guarantor::ensure_global('category_tree')->get_ancestors($current_category_id));
     $cPath_array[] = $current_category_id;
   }
 
