@@ -19,18 +19,14 @@
     }
 
     public function execute() {
-      $sql = <<<'EOSQL'
-SELECT DISTINCT p.*, pd.*,
-   IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-   IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-   p.products_quantity AS in_stock,
-   IF(s.status, 1, 0) AS is_special,
-   IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
+      $sql = sprintf(<<<'EOSQL'
+SELECT DISTINCT %s
  FROM products p LEFT JOIN specials s ON p.products_id = s.products_id
    INNER JOIN products_description pd ON p.products_id = pd.products_id
    LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
 
-EOSQL;
+EOSQL
+      , Product::COLUMNS);
 
       if ( empty($GLOBALS['new_products_category_id']) ) {
         $sql .= " WHERE";

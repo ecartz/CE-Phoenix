@@ -26,12 +26,7 @@ EOSQL
       }
 
       $product_query = tep_db_query(sprintf(<<<'EOSQL'
-SELECT pd.*, p.*,
-    IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-    IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-    p.products_quantity AS in_stock,
-    IF(s.status, 1, 0) AS is_special,
-    IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes,
+SELECT %s,
     SUBSTRING(rd.reviews_text, 1, 60) AS reviews_text,
     r.reviews_rating
   FROM reviews r
@@ -43,7 +38,7 @@ SELECT pd.*, p.*,
   WHERE p.products_status = 1 AND pd.language_id = %d
   ORDER BY r.reviews_id DESC LIMIT 1 OFFSET %d
 EOSQL
-        , (int)$_SESSION['languages_id'], (int)$random_selection['offset']));
+        , Product::COLUMNS, (int)$_SESSION['languages_id'], (int)$random_selection['offset']));
 
       if ($product = tep_db_fetch_array($product_query)) {
         return new Product($product);

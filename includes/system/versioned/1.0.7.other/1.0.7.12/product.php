@@ -19,6 +19,10 @@
         $this->_data[isset($data[$trimmed_key]) ? $key : $trimmed_key] = $value;
       }
 
+      if (!isset($this->_data['final_price']) && isset($this->_data['base_price'])) {
+        $this->_data['final_price'] = $this->_data['base_price'];
+      }
+
       if (isset($this->_data['id']) && !isset($this->_data['link'])) {
         $this->_data['link'] = static::build_link((int)$this->_data['id']);
       }
@@ -63,12 +67,12 @@
       return sprintf(IS_PRODUCT_SHOW_PRICE, $this->format());
     }
 
-    public function format($price = 'final_price') {
-      return $GLOBALS['currencies']->display_price($this->get($price), $this->get('tax_rate'));
+    public function format($price = 'final_price', $quantity = 1) {
+      return $GLOBALS['currencies']->display_price($this->get($price), $this->get('tax_rate'), $quantity);
     }
 
-    public function format_raw($price = 'final_price') {
-      return $GLOBALS['currencies']->display_raw($this->get($price), $this->get('tax_rate'));
+    public function format_raw($price = 'final_price', $quantity = 1) {
+      return $GLOBALS['currencies']->display_raw($this->get($price), $this->get('tax_rate'), $quantity);
     }
 
     public function increment_view_count() {

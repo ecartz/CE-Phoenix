@@ -15,12 +15,7 @@
   require language::map_to_translation('products_new.php');
 
   $listing_sql = sprintf(<<<'EOSQL'
-SELECT p.*, pd.*, m.*,
-  IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-  IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-  p.products_quantity AS in_stock,
-  IF(s.status, 1, 0) AS is_special,
-  IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
+SELECT m.*, %s
  FROM
   products_description pd,
     INNER JOIN products p ON p.products_id = pd.products_id
@@ -29,7 +24,7 @@ SELECT p.*, pd.*, m.*,
     LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
  WHERE p.products_status = 1 AND pd.language_id = %d
 EOSQL
-  , (int)$_SESSION['languages_id']);
+  , Product::COLUMNS, (int)$_SESSION['languages_id']);
 
   $default_column = 'PRODUCT_LIST_ID';
   $sort_order = 'd';

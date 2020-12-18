@@ -19,30 +19,27 @@
     }
 
     function execute() {
-      global $currencies, $PHP_SELF;
-
-      $content_width = (int)MODULE_CONTENT_PRODUCT_INFO_ALSO_PURCHASED_CONTENT_WIDTH;
-      $card_layout = IS_PRODUCT_PRODUCTS_DISPLAY_ROW;
-
-      $orders_query = tep_db_query(<<<'EOSQL'
-SELECT
-  p.*, pd.*,
-  IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-  IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-  p.products_quantity AS in_stock,
-  IF(s.status, 1, 0) AS is_special
+      $also_purchased_query = tep_db_query(sprintf(<<<'EOSQL'
+SELECT %s
  FROM orders_products opa
-   INNER JOIN orders_products opb ON opa.orders_id = opb.orders_id
+   INNER JOIN orders_products opb ON opa.orders_id = opb.orders_id AND opa.products_id != opb.products_id
    INNER JOIN orders o ON opb.orders_id = o.orders_id
    INNER JOIN products p ON opb.products_id = p.products_id
    LEFT JOIN specials s ON p.products_id = s.products_id
    LEFT JOIN products_description pd ON p.products_id = pd.products_id
- WHERE p.products_status = 1 AND opa.products_id != opb.products_id AND opa.products_id = 
+   LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
+ WHERE p.products_status = 1
+   AND opa.products_id = %d
+   AND pd.language_id = %d
+ GROUP BY p.products_id
+ ORDER BY o.date_purchased DESC
+ LIMIT %d
 EOSQL
-        . (int)$_GET['products_id']
-        . " AND pd.language_id = " . (int)$_SESSION['languages_id']
-        . " GROUP BY p.products_id ORDER BY o.date_purchased DESC LIMIT " . (int)MODULE_CONTENT_PRODUCT_INFO_ALSO_PURCHASED_CONTENT_LIMIT);
-      $num_products_ordered = tep_db_num_rows($orders_query);
+        , Product::COLUMNS,
+        (int)$_GET['products_id'],
+        (int)$_SESSION['languages_id'],
+        (int)MODULE_CONTENT_PRODUCT_INFO_ALSO_PURCHASED_CONTENT_LIMIT));
+      $num_products_ordered = tep_db_num_rows($also_purchased_query);
 
       if ($num_products_ordered > 0) {
         $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];

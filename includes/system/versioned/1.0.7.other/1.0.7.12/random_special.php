@@ -26,7 +26,7 @@ EOSQL
 
       $product_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT pd.*, p.*, s.*,
-    s.specials_new_products_price AS final_price,
+    s.specials_new_products_price AS base_price,
     p.products_quantity AS in_stock,
     1 AS is_special,
     IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes

@@ -8,6 +8,16 @@
 
   class product_builder extends product_loader {
 
+    const COLUMNS = <<<'EOSQL'
+pd.*, p.*,
+    IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
+    IF(s.status, s.specials_new_products_price, p.products_price) AS base_price,
+    p.products_quantity AS in_stock,
+    IF(s.status, 1, 0) AS is_special,
+    IF(s.status, s.expires_date, NULL) AS special_expiration,
+    IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
+EOSQL;
+
     public static function build_link($product, $parameters = '') {
       $product_id = is_numeric($product) ? $product : $product->get('id');
       return tep_href_link('product_info.php', "{$parameters}products_id=" . (int)$product_id);
@@ -25,7 +35,7 @@
       return $product->get('data-attributes');
     }
 
-    public static function build_prid() {
+    public static function build_prid($uprid) {
       $pieces = explode('{', $uprid);
       return is_numeric($pieces[0]) ? (int)$pieces[0] : false;
     }

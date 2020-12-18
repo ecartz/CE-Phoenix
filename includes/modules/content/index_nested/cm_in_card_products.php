@@ -20,12 +20,7 @@
 
     public function execute() {
       $card_products_query = tep_db_query(sprintf(<<<'EOSQL'
-SELECT DISTINCT p.*, pd.*,
-  IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-  IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-  p.products_quantity AS in_stock,
-  IF(s.status, 1, 0) AS is_special,
-  IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
+SELECT DISTINCT %s
  FROM products p
   LEFT JOIN specials s ON p.products_id = s.products_id
   INNER JOIN products_description pd ON p.products_id = pd.products_id
@@ -35,7 +30,8 @@ SELECT DISTINCT p.*, pd.*,
  WHERE p.products_status = 1 AND c.parent_id = %d AND pd.language_id = %d
  ORDER BY p.products_id DESC LIMIT %d
 EOSQL
-        , (int)$GLOBALS['current_category_id'],
+        , Product::COLUMNS,
+          (int)$GLOBALS['current_category_id'],
           (int)$_SESSION['languages_id'],
           (int)MODULE_CONTENT_IN_CARD_PRODUCTS_MAX_DISPLAY));
 

@@ -37,30 +37,10 @@
         $products = $_SESSION['cart']->get_products();
         $products_field = '';
 
-        for ($i=0, $n=count($products); $i<$n; $i++) {
+        foreach ($products as $product) {
           // Push all attributes information in an array
-          foreach (($products[$i]['attributes'] ?? []) as $option => $value) {
-            $products_field .= tep_draw_hidden_field('id[' . $products[$i]['id'] . '][' . $option . ']', $value);
-            $attributes = tep_db_query(sprintf(<<<'EOSQL'
-SELECT popt.*, poval.*, pa.*
- FROM products_options popt
-   INNER JOIN products_attributes pa ON pa.options_id = popt.products_options_id
-   INNER JOIN products_options_values poval
-     ON pa.options_values_id = poval.products_options_values_id
-    AND popt.language_id = poval.language_id
- WHERE pa.products_id = %d
-   AND pa.options_id = %d
-   AND pa.options_values_id = %d
-   AND popt.language_id = %d
-EOSQL
-              , (int)$products[$i]['id'], (int)$option, (int)$value, (int)$_SESSION['languages_id']));
-            $attributes_values = tep_db_fetch_array($attributes);
-
-            $products[$i][$option]['products_options_name'] = $attributes_values['products_options_name'];
-            $products[$i][$option]['options_values_id'] = $value;
-            $products[$i][$option]['products_options_values_name'] = $attributes_values['products_options_values_name'];
-            $products[$i][$option]['options_values_price'] = $attributes_values['options_values_price'];
-            $products[$i][$option]['price_prefix'] = $attributes_values['price_prefix'];
+          foreach (($product->get('attribute_selections') ?? []) as $option => $value) {
+            $products_field .= tep_draw_hidden_field('id[' . $product->get('id') . '][' . $option . ']', $value);
           }
         }
 

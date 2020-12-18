@@ -91,14 +91,10 @@
     tep_redirect(tep_href_link('advanced_search.php', tep_get_all_get_params(), 'NONSSL', true, false));
   }
 
-  $select_str = <<<'EOSQL'
-SELECT DISTINCT p.products_id, m.*, p.*, pd.*,
-    p.products_quantity AS in_stock,
-    IF(s.status, s.specials_new_products_price, NULL) AS specials_new_products_price,
-    IF(s.status, s.specials_new_products_price, p.products_price) AS final_price,
-    IF(s.status, 1, 0) AS is_special,
-    IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
-EOSQL;
+  $select_str = sprintf(<<<'EOSQL'
+SELECT DISTINCT p.products_id, m.*, %s
+EOSQL
+  , Product::COLUMNS);
 
   if ( (DISPLAY_PRICE_WITH_TAX == 'true') && (tep_not_null($pfrom) || tep_not_null($pto)) ) {
     $select_str .= ", SUM(tr.tax_rate) AS tax_rate";
