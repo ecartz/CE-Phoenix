@@ -19,7 +19,7 @@
     function execute() {
       global $oscTemplate, $product;
 
-      if (isset($_GET['products_id'], $product->get('name')) && (basename($GLOBALS['PHP_SELF']) == 'product_info.php')) {
+      if (isset($_GET['products_id'], $product) && (basename($GLOBALS['PHP_SELF']) === 'product_info.php') && $product->get('name')) {
         $oscTemplate->setTitle(
           ((MODULE_HEADER_TAGS_PRODUCT_TITLE_SEO_TITLE_OVERRIDE === 'True') && ( tep_not_null($product->get('seo_title')))
             ? $product->get('seo_title')

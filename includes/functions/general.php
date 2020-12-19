@@ -35,7 +35,6 @@
 
     header('Location: ' . $url);
 
-
     exit();
   }
 
