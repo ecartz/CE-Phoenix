@@ -27,7 +27,7 @@
     }
     echo '</th>';
 
-    if (STOCK_CHECK == 'true' && tep_check_stock($product->get('id'), $product->get('quantity'))) {
+    if (STOCK_CHECK == 'true' && $product->lacks_stock()) {
       $GLOBALS['any_out_of_stock'] = true;
 
       echo '<td><span class="text-danger"><b>' . STOCK_MARK_PRODUCT_OUT_OF_STOCK . '</b></span></td>';

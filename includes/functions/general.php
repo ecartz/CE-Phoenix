@@ -107,7 +107,7 @@
 // Return a product's stock
 // TABLES: products
   function tep_get_products_stock($products_id) {
-    $products_id = tep_get_prid($products_id);
+    $products_id = Product::build_prid($products_id);
     $stock_query = tep_db_query("SELECT products_quantity FROM products WHERE products_id = " . (int)$products_id);
     $stock_values = tep_db_fetch_array($stock_query);
 
@@ -171,37 +171,12 @@
 ////
 // Generate a path to categories
   function tep_get_path($current_category_id = '') {
-    global $cPath_array;
+    trigger_error('The tep_get_path function has been deprecated.', E_USER_DEPRECATED);
 
-    if (tep_not_null($current_category_id)) {
-      $cp_size = count($cPath_array);
-      if ($cp_size == 0) {
-        $cPath_new = $current_category_id;
-      } else {
-        $cPath_new = '';
-        $last_category_query = tep_db_query("SELECT parent_id FROM categories WHERE categories_id = " . (int)$cPath_array[($cp_size-1)]);
-        $last_category = tep_db_fetch_array($last_category_query);
-
-        $current_category_query = tep_db_query("SELECT parent_id FROM categories WHERE categories_id = " . (int)$current_category_id);
-        $current_category = tep_db_fetch_array($current_category_query);
-
-        if ($last_category['parent_id'] == $current_category['parent_id']) {
-          for ($i=0; $i<($cp_size-1); $i++) {
-            $cPath_new .= '_' . $cPath_array[$i];
-          }
-        } else {
-          for ($i=0; $i<$cp_size; $i++) {
-            $cPath_new .= '_' . $cPath_array[$i];
-          }
-        }
-        $cPath_new .= '_' . $current_category_id;
-
-        if (substr($cPath_new, 0, 1) == '_') {
-          $cPath_new = substr($cPath_new, 1);
-        }
-      }
+    if (empty($current_category_id)) {
+      $cPath_new = implode('_', (array)$GLOBALS['cPath_array']);
     } else {
-      $cPath_new = implode('_', (array)$cPath_array);
+      $cPath_new = $GLOBALS['category_tree']->find_path($current_category_id);
     }
 
     return 'cPath=' . $cPath_new;
@@ -335,6 +310,7 @@
   }
 
   function tep_get_categories($categories = [], $parent_id = '0', $indent = '') {
+    trigger_error('The tep_get_categories function has been deprecated.', E_USER_DEPRECATED);
     if (!is_array($categories)) $categories = [];
 
     $category_tree =& Guarantor::ensure_global('category_tree');
@@ -360,6 +336,7 @@
 ////
 // Return all subcategory IDs
   function tep_get_subcategories(&$descendants, $parent_id = 0) {
+    trigger_error('The tep_get_subcategories function has been deprecated.', E_USER_DEPRECATED);
     $descendants = array_merge(
       $descendants,
       Guarantor::ensure_global('category_tree')->get_descendants($parent_id));
@@ -577,7 +554,7 @@
 ////
 // Construct a category path to the product
   function tep_get_product_path($products_id) {
-    trigger_error('The tep_get_parent_categories function has been deprecated.', E_USER_DEPRECATED);
+    trigger_error('The tep_get_product_path function has been deprecated.', E_USER_DEPRECATED);
 
     $product = product_by_id($products_id);
     return $product->get('status') ? $product->find_path() : '';
@@ -586,12 +563,14 @@
 ////
 // Return a product ID with attributes
   function tep_get_uprid($prid, $params) {
+    trigger_error('The tep_get_uprid function has been deprecated.', E_USER_DEPRECATED);
     return Product::build_uprid($prid, $params);
   }
 
 ////
 // Return a product ID from a product ID with attributes
   function tep_get_prid($uprid) {
+    trigger_error('The tep_get_prid function has been deprecated.', E_USER_DEPRECATED);
     return Product::build_prid($uprid);
   }
 
@@ -651,6 +630,7 @@
 ////
 // Check if product has attributes
   function tep_has_product_attributes($products_id) {
+    trigger_error('The tep_has_product_attributes function has been deprecated.', E_USER_DEPRECATED);
     $attributes_query = tep_db_query("SELECT COUNT(*) AS count FROM products_attributes WHERE products_id = " . (int)$products_id);
     $attributes = tep_db_fetch_array($attributes_query);
 
@@ -786,6 +766,7 @@
 // make sure the category IDs are integers
 // make sure no duplicate category IDs exist which could lock the server in a loop
   function tep_parse_category_path($cPath) {
+    trigger_error('The tep_parse_category_path function has been deprecated.', E_USER_DEPRECATED);
     return array_unique(array_map(function ($s) { return (int)$s; }, explode('_', $cPath)), SORT_NUMERIC);
   }
 

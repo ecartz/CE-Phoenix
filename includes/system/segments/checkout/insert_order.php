@@ -99,7 +99,7 @@ EOSQL;
   $sql_data['orders_products_download'] = [];
   foreach ($order->products as $i => $product) {
     $sql_data['orders_products'][$i] = [
-      'products_id' => tep_get_prid($product['id']),
+      'products_id' => Product::build_prid($product['id']),
       'products_model' => $product['model'],
       'products_name' => $product['name'],
       'products_price' => $product['price'],

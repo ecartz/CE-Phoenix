@@ -85,4 +85,8 @@
            : '';
     }
 
+    public function lacks_stock($quantity = null) {
+      return $this->get('in_stock') < ($quantity ?? $this->get('quantity'));
+    }
+
   }

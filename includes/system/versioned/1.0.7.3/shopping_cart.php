@@ -81,8 +81,8 @@
         $products_id = $product->get('id');
       }
 
-      $products_id_string = tep_get_uprid($products_id, $attributes);
-      $products_id = tep_get_prid($products_id_string);
+      $products_id_string = Product::build_uprid($products_id, $attributes);
+      $products_id = Product::build_prid($products_id_string);
 
       if (!isset($product)) {
         $product = product_by_id::build($products_id);
@@ -147,8 +147,8 @@
     }
 
     function update_quantity($products_id, $quantity, $attributes = null) {
-      $products_id_string = tep_get_uprid($products_id, $attributes);
-      $products_id = tep_get_prid($products_id_string);
+      $products_id_string = Product::build_uprid($products_id, $attributes);
+      $products_id = Product::build_prid($products_id_string);
 
       if (defined('MAX_QTY_IN_CART') && (MAX_QTY_IN_CART > 0) && ((int)$quantity > MAX_QTY_IN_CART)) {
         $quantity = MAX_QTY_IN_CART;
@@ -245,40 +245,37 @@ EOSQL
       $this->total = 0;
       $this->weight = 0;
 
-      foreach (array_keys($this->contents) as $products_id) {
-        $qty = $this->contents[$products_id]['qty'];
+      foreach (array_keys($this->contents) as $product_id) {
+        $qty = $this->contents[$product_id]['qty'];
 
-// products price
-        $product = product_by_id::build($products_id);
+// product price
+        $product = product_by_id::build(Product::build_prid($product_id));
         if ($product->get('status')) {
           $products_price = $product->get('base_price');
 
 // attributes price
-          if (!empty($this->contents[$products_id]['attributes'])) {
-            $products_price += $this->attributes_price($products_id);
+          if (!empty($this->contents[$product_id]['attributes'])) {
+            $products_price += $this->attributes_price($product_id, $product->get('attributes'));
           }
 
           $this->total += $GLOBALS['currencies']->calculate_price($products_price, $product->get('tax_rate'), $qty);
           $this->weight += ($qty * $product->get('weight'));
         } else {
-          $this->_remove($products_id);
-          $GLOBALS['messageStack']->add('product_action', sprintf(PRODUCT_REMOVED, Product::fetch_name($products_id)));
+          $this->_remove($product_id);
+          $GLOBALS['messageStack']->add('product_action', sprintf(PRODUCT_REMOVED, Product::fetch_name($product_id)));
         }
 
       }
     }
 
-    function attributes_price($product) {
+    function attributes_price($product_id, $attributes) {
       $attributes_price = 0;
 
-      $attributes = $product->get('attributes');
-      foreach (($this->contents[$product->get('id')]['attributes'] ?? []) as $option => $value) {
-        $attribute_price_query = tep_db_query("SELECT options_values_price, price_prefix FROM products_attributes WHERE products_id = " . (int)$product->get('id') . " AND options_id = " . (int)$option . " AND options_values_id = " . (int)$value);
-        $attribute_price = tep_db_fetch_array($attribute_price_query);
-        if ($attribute_price['price_prefix'] == '+') {
-          $attributes_price += $attribute_price['options_values_price'];
+      foreach (($this->contents[$product_id]['attributes'] ?? []) as $option => $value) {
+        if ($attributes[$option]['values'][$value]['prefix'] == '+') {
+          $attributes_price += $attributes[$option]['values'][$value]['price'];
         } else {
-          $attributes_price -= $attribute_price['options_values_price'];
+          $attributes_price -= $attributes[$option]['values'][$value]['price'];
         }
       }
 
@@ -291,7 +288,7 @@ EOSQL
         $product = product_by_id::build($prid = Product::build_prid($product_id));
         if ($product->get('status')) {
           $product->set('quantity', $this->contents[$product_id]['qty']);
-          $product->set('final_price', $product->get('base_price') + $this->attributes_price($product));
+          $product->set('final_price', $product->get('base_price') + $this->attributes_price($product_id, $product->get('attributes')));
           $product->set('attribute_selections', $this->contents[$product_id]['attributes'] ?? null);
 
           $products[] = $product;

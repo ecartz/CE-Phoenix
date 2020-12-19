@@ -127,20 +127,15 @@ EOSQL
     LEFT JOIN (SELECT products_id, COUNT(*) AS attribute_count FROM products_attributes GROUP BY products_id) a ON p.products_id = a.products_id
 EOSQL;
 
-  $where_str = sprintf(" WHERE p.products_status = 1 AND pd.language_id = %d ", (int)$_SESSION['languages_id']);
+  $where_str = sprintf(" WHERE p.products_status = 1 AND pd.language_id = %d", (int)$_SESSION['languages_id']);
 
   if (isset($_GET['categories_id']) && tep_not_null($_GET['categories_id'])) {
-    if (isset($_GET['inc_subcat']) && ($_GET['inc_subcat'] == '1')) {
-      $subcategories_array = [];
-      tep_get_subcategories($subcategories_array, $_GET['categories_id']);
-
-      $where_str .= " AND (c.categories_id = " . (int)$_GET['categories_id'];
-
-      foreach ($subcategories_array as $subcategory_id) {
-        $where_str .= " OR c.categories_id = " . (int)$subcategory_id;
-      }
-
-      $where_str .= ")";
+    if (isset($_GET['inc_subcat'])
+      && ($_GET['inc_subcat'] == '1')
+      && ($categories = $category_tree->get_descendants($_GET['categories_id'])))
+    {
+      $categories[] = $_GET['categories_id'];
+      $where_str .= " AND c.categories_id IN (" . implode(', ', array_map('intval', $categories)) . ")";
     } else {
       $where_str .= " AND c.categories_id = " . (int)$_GET['categories_id'];
     }
