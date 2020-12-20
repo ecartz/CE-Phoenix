@@ -15,7 +15,7 @@
       'attributes' => 'Product::load_attributes',
       'brand' => 'Product::load_brand',
       'categories' => 'Product::load_categories',
-      'data-attributes' => 'Product::build_data_attributes',
+      'data_attributes' => 'Product::build_data_attributes',
       'images' => 'Product::load_images',
       'link' => 'Product::build_link',
       'notify' => 'Product::load_notify',

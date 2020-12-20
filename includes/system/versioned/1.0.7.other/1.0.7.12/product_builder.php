@@ -28,11 +28,11 @@ EOSQL;
       $data['data-product-price'] = $product->format_raw();
       $data['data-product-manufacturer'] = $product->get('manufacturers_id');
 
-      $product->set('data-attributes', implode(array_map(function ($key, $value) {
+      $product->set('data_attributes', implode(array_map(function ($key, $value) {
         return ' ' . htmlspecialchars($key) . '="' . htmlspecialchars($value) . '"';
       }, array_keys($data), $data)));
 
-      return $product->get('data-attributes');
+      return $product->get('data_attributes');
     }
 
     public static function build_prid($uprid) {
