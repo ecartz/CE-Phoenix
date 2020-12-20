@@ -25,7 +25,7 @@
     function execute() {
       global $product;
 
-      if (isset($product, $product->get('name'))) {
+      if (isset($product, $product) && $product->get('status')) {
         $images = $product->get('images');
         $products_image = ( count($images) > 0 )
                         ? $images[0]['image']
