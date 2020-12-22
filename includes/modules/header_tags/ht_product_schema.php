@@ -34,18 +34,18 @@
         $schema_product = [
           '@context'    => 'https://schema.org',
           '@type'       => 'Product',
-          'name'        => tep_db_output($product->get('name')),
+          'name'        => htmlspecialchars($product->get('name')),
           'image'       => tep_href_link('images/' . $products_image, '', 'NONSSL', false, false),
           'url'         => tep_href_link('product_info.php', 'products_id=' . (int)$product->get('id'), 'NONSSL', false, false),
           'description' => substr(trim(preg_replace('/\s\s+/', ' ', strip_tags($product->get('description')))), 0, 197) . '...',
         ];
 
         if (tep_not_null($product->get('model') ?? null)) {
-          $schema_product['mpn'] = tep_db_output($product->get('model'));
+          $schema_product['mpn'] = htmlspecialchars($product->get('model'));
         }
 
         if (tep_not_null($product->get('gtin') ?? null) && defined('MODULE_CONTENT_PRODUCT_INFO_GTIN_LENGTH')) {
-          $schema_product['gtin' .  MODULE_CONTENT_PRODUCT_INFO_GTIN_LENGTH] = tep_db_output(substr($product->get('gtin'), 0-MODULE_CONTENT_PRODUCT_INFO_GTIN_LENGTH));
+          $schema_product['gtin' .  MODULE_CONTENT_PRODUCT_INFO_GTIN_LENGTH] = htmlspecialchars(substr($product->get('gtin'), 0-MODULE_CONTENT_PRODUCT_INFO_GTIN_LENGTH));
         }
 
         $schema_product['offers'] = [
@@ -70,7 +70,7 @@
         if (($product->get('manufacturers_id') ?? 0) > 0) {
           $schema_product['manufacturer'] = [
             '@type' => 'Organization',
-            'name'  => tep_db_output($product->get('brand')->getData('manufacturers_name')),
+            'name'  => htmlspecialchars($product->get('brand')->getData('manufacturers_name')),
           ];
         }
 
@@ -85,10 +85,10 @@
           foreach ($product->get('reviews') as $review) {
               $schema_product['review'][] = [
                 '@type'         => 'Review',
-                'author'        => tep_db_output($review['customers_name']),
-                'datePublished' => tep_db_output($review['date_added']),
-                'description'   => tep_db_output($review['text']),
-                'name'          => tep_db_output($product->get('name')),
+                'author'        => htmlspecialchars($review['customers_name']),
+                'datePublished' => htmlspecialchars($review['date_added']),
+                'description'   => htmlspecialchars($review['text']),
+                'name'          => htmlspecialchars($product->get('name')),
                 'reviewRating'  => [
                   '@type'       => 'Rating',
                   'bestRating'  => '5',

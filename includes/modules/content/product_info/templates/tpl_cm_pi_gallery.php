@@ -1,12 +1,12 @@
 <div class="col-sm-<?php echo $content_width; ?> cm-pi-gallery">
   <?php
   $pi_image .= '<a href="#lightbox" class="lb" data-toggle="modal" data-slide="0">';
-  $pi_image .= tep_image('images/' . $active_image['image'], tep_db_output( $active_image['htmlcontent']));
+  $pi_image .= tep_image('images/' . $active_image['image'], htmlspecialchars( $active_image['htmlcontent']));
   $pi_image .= '</a>';
 
   $first_img_indicator = '<li data-target="#carousel" data-slide-to="0" class="pointer active"></li>';
   $first_img = '<div class="carousel-item text-center active">';
-  $first_img .= tep_image('images/' . $active_image['image'], tep_db_output($active_image['htmlcontent']), null, null, 'loading="lazy"');
+  $first_img .= tep_image('images/' . $active_image['image'], htmlspecialchars($active_image['htmlcontent']), null, null, 'loading="lazy"');
   $first_img .= '</div>';
 
   // now create the thumbs

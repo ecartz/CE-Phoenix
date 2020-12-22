@@ -119,6 +119,7 @@
   }
 
   function tep_db_output($string) {
+    trigger_error('The tep_db_output function has been deprecated.', E_USER_DEPRECATED);
     return htmlspecialchars($string);
   }
 
