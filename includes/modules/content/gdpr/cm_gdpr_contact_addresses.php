@@ -23,15 +23,15 @@
 
       $content_width = (int)MODULE_CONTENT_GDPR_CONTACT_ADDRESSES_CONTENT_WIDTH;
 
-      $addresses_query = tep_db_query("SELECT address_book_id from address_book where customers_id = '" . (int)$_SESSION['customer_id'] . "' and address_book_id != '" . (int)$customer->get_default_address_id() . "'");
+      $addresses_query = tep_db_query("SELECT address_book_id from address_book where customers_id = " . (int)$_SESSION['customer_id'] . " and address_book_id != " . (int)$customer->get('default_address_id'));
 
-      $num_addresses = tep_db_num_rows($addresses_query);
+      $num_addresses = mysqli_num_rows($addresses_query);
 
       if ($num_addresses > 0) {
         $port_my_data['YOU']['CONTACT']['ADDRESS']['OTHER']['COUNT'] = $num_addresses;
 
         $a = 1;
-        while ($addresses = tep_db_fetch_array($addresses_query)) {
+        while ($addresses = $addresses_query->fetch_assoc()) {
           $port_my_data['YOU']['CONTACT']['ADDRESS']['OTHER']['LIST'][$a]['ID'] = (int)$addresses['address_book_id'];
           $port_my_data['YOU']['CONTACT']['ADDRESS']['OTHER']['LIST'][$a]['ADDRESS'] = $customer->make_address_label($addresses['address_book_id'], true, ' ', ', ');
 

@@ -106,7 +106,7 @@
       $encoded = $this->_encoded;
 
       if (tep_not_null($this->_subparts)) {
-        $boundary = '=_' . md5(uniqid(tep_rand()) . microtime());
+        $boundary = '=_' . md5(uniqid(mt_rand()) . microtime());
         $this->_headers['Content-Type'] .= ';' . $this->lf . chr(9) . 'boundary="' . $boundary . '"';
 
 // Add body parts to $subparts

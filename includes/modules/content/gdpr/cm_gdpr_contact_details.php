@@ -21,19 +21,17 @@
     function execute() {
       global $port_my_data, $customer;
 
-      $content_width = (int)MODULE_CONTENT_GDPR_CONTACT_DETAILS_CONTENT_WIDTH;
-
-      $port_my_data['YOU']['CONTACT']['EMAIL'] = $customer->get('customers_email_address');
-      $port_my_data['YOU']['CONTACT']['PHONE'] = $customer->get('customers_telephone');
+      $port_my_data['YOU']['CONTACT']['EMAIL'] = $customer->get('email_address');
+      $port_my_data['YOU']['CONTACT']['PHONE'] = $customer->get('telephone');
 
       if ($GLOBALS['customer']->get('customers_fax')) {
-        $port_my_data['YOU']['CONTACT']['FAX'] = $customer->get('customers_fax');
+        $port_my_data['YOU']['CONTACT']['FAX'] = $customer->get('fax');
       } else {
         $port_my_data['YOU']['CONTACT']['FAX'] = MODULE_CONTENT_GDPR_CONTACT_DETAILS_UNKNOWN;
       }
 
       $port_my_data['YOU']['CONTACT']['ADDRESS']['MAIN']['COUNT'] = 1;
-      $port_my_data['YOU']['CONTACT']['ADDRESS']['MAIN']['LIST'][1] = $customer->make_address_label($customer->get_default_address_id(), true, ' ', ', ');
+      $port_my_data['YOU']['CONTACT']['ADDRESS']['MAIN']['LIST'][1] = $customer->make_address_label($customer->get('default_address_id'), true, ' ', ', ');
 
       $tpl_data = [ 'group' => $this->group, 'file' => __FILE__ ];
       include 'includes/modules/content/cm_template.php';

@@ -95,15 +95,9 @@
 
       $reviews_query = tep_db_query("SELECT r.*, rd.* FROM reviews r INNER JOIN reviews_description rd ON r.reviews_id = rd.reviews_id WHERE r.reviews_id = " . (int)$rID);
       $reviews = tep_db_fetch_array($reviews_query);
+      $reviews['product'] = product_by_id::build($reviews['products_id']);
 
-      $products_query = tep_db_query("SELECT products_image FROM products WHERE products_id = " . (int)$reviews['products_id']);
-      $products = tep_db_fetch_array($products_query);
-
-      $products_name_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$reviews['products_id'] . " AND language_id = " . (int)$_SESSION['languages_id']);
-      $products_name = tep_db_fetch_array($products_name_query);
-
-      $rInfo_array = array_merge($reviews, $products, $products_name);
-      $rInfo = new objectInfo($rInfo_array);
+      $rInfo = new objectInfo($reviews);
 
       if (!isset($rInfo->reviews_status)) {
         $rInfo->reviews_status = '1';
@@ -189,15 +183,9 @@
 
       $reviews_query = tep_db_query("SELECT r.*, rd.* FROM reviews r INNER JOIN reviews_description rd ON r.reviews_id = rd.reviews_id WHERE r.reviews_id = " . (int)$rID);
       $reviews = tep_db_fetch_array($reviews_query);
+      $reviews['product'] = product_by_id::build($reviews['products_id']);
 
-      $products_query = tep_db_query("SELECT products_image FROM products WHERE products_id = " . (int)$reviews['products_id']);
-      $products = tep_db_fetch_array($products_query);
-
-      $products_name_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$reviews['products_id'] . " AND language_id = " . (int)$_SESSION['languages_id']);
-      $products_name = tep_db_fetch_array($products_name_query);
-
-      $rInfo_array = array_merge($reviews, $products, $products_name);
-      $rInfo = new objectInfo($rInfo_array);
+      $rInfo = new objectInfo($reviews);
     }
 ?>
     <div class="row">
@@ -282,19 +270,9 @@
               if (!isset($rInfo) && (!isset($_GET['rID']) || ($_GET['rID'] == $reviews['reviews_id']))) {
                 $reviews_text_query = tep_db_query("SELECT r.*, rd.*, LENGTH(rd.reviews_text) AS reviews_text_size FROM reviews r INNER JOIN reviews_description rd ON r.reviews_id = rd.reviews_id WHERE r.reviews_id = " . (int)$reviews['reviews_id']);
                 $reviews_text = tep_db_fetch_array($reviews_text_query);
+                $reviews_text['product'] = product_by_id::build($reviews['products_id']);
 
-                $products_image_query = tep_db_query("SELECT products_image FROM products WHERE products_id = " . (int)$reviews['products_id']);
-                $products_image = tep_db_fetch_array($products_image_query);
-
-                $products_name_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$reviews['products_id'] . " AND language_id = " . (int)$_SESSION['languages_id']);
-                $products_name = tep_db_fetch_array($products_name_query);
-
-                $reviews_average_query = tep_db_query("SELECT (AVG(reviews_rating) / 5 * 100) AS average_rating FROM reviews WHERE products_id = " . (int)$reviews['products_id']);
-                $reviews_average = tep_db_fetch_array($reviews_average_query);
-
-                $review_info = array_merge($reviews_text, $reviews_average, $products_name);
-                $rInfo_array = array_merge($reviews, $review_info, $products_image);
-                $rInfo = new objectInfo($rInfo_array);
+                $rInfo = new objectInfo($reviews_text);
               }
 
               if (isset($rInfo->reviews_id) && ($reviews['reviews_id'] == $rInfo->reviews_id) ) {
@@ -305,7 +283,7 @@
                 $icon = '<a href="' . tep_href_link('reviews.php', 'page=' . (int)$_GET['page'] . '&rID=' . $reviews['reviews_id']) . '"><i class="fas fa-info-circle text-muted"></i></a>';
               }
               ?>
-                <td><?= tep_get_products_name($reviews['products_id']) ?></td>
+                <td><?= Product::fetch_name($reviews['products_id']) ?></td>
                 <td class="text-center"><?= tep_draw_stars($reviews['reviews_rating']) ?></td>
                 <td class="text-right"><?= tep_date_short($reviews['date_added']) ?></td>
                 <td class="text-center"><?= ($reviews['reviews_status'] == '1') ? '<i class="fas fa-check-circle text-success"></i> <a href="' . tep_href_link('reviews.php', 'action=setflag&flag=0&rID=' . $reviews['reviews_id'] . '&page=' . (int)$_GET['page']) . '"><i class="fas fa-times-circle text-muted"></i></a>' : '<a href="' . tep_href_link('reviews.php', 'action=setflag&flag=1&rID=' . $reviews['reviews_id'] . '&page=' . (int)$_GET['page']) . '"><i class="fas fa-check-circle text-muted"></i></a> <i class="fas fa-times-circle text-danger"></i>' ?></td>
@@ -339,19 +317,22 @@
         break;
       default:
       if (isset($rInfo) && is_object($rInfo)) {
-        $heading[] = ['text' => $rInfo->products_name];
+        $heading[] = ['text' => $rInfo->product->get('name')];
 
-        $contents[] = ['class' => 'text-center', 'text' => tep_draw_bootstrap_button(IMAGE_EDIT, 'fas fa-cogs', tep_href_link('reviews.php', 'page=' . (int)$_GET['page'] . '&rID=' . $rInfo->reviews_id . '&action=edit'), null, null, 'btn-warning mr-2') . tep_draw_bootstrap_button(IMAGE_DELETE, 'fas fa-trash', tep_href_link('reviews.php', 'page=' . (int)$_GET['page'] . '&rID=' . $rInfo->reviews_id . '&action=delete'), null, null, 'btn-danger')];
+        $contents[] = [
+          'class' => 'text-center',
+          'text' => tep_draw_bootstrap_button(IMAGE_EDIT, 'fas fa-cogs', tep_href_link('reviews.php', 'page=' . (int)$_GET['page'] . '&rID=' . $rInfo->reviews_id . '&action=edit'), null, null, 'btn-warning mr-2')
+                  . tep_draw_bootstrap_button(IMAGE_DELETE, 'fas fa-trash', tep_href_link('reviews.php', 'page=' . (int)$_GET['page'] . '&rID=' . $rInfo->reviews_id . '&action=delete'), null, null, 'btn-danger')];
         $contents[] = ['text' => sprintf(TEXT_INFO_DATE_ADDED, tep_date_short($rInfo->date_added))];
         if (tep_not_null($rInfo->last_modified)) {
           $contents[] = ['text' => sprintf(TEXT_INFO_LAST_MODIFIED, tep_date_short($rInfo->last_modified))];
         }
-        $contents[] = ['text' => tep_info_image($rInfo->products_image, $rInfo->products_name, SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT)];
+        $contents[] = ['text' => tep_info_image($rInfo->product->get('image'), $rInfo->product->get('name'), SMALL_IMAGE_WIDTH, SMALL_IMAGE_HEIGHT)];
         $contents[] = ['text' => sprintf(TEXT_INFO_REVIEW_AUTHOR, $rInfo->customers_name)];
         $contents[] = ['text' => sprintf(TEXT_INFO_REVIEW_RATING, tep_draw_stars($rInfo->reviews_rating))];
         $contents[] = ['text' => sprintf(TEXT_INFO_REVIEW_READ, $rInfo->reviews_read)];
         $contents[] = ['text' => sprintf(TEXT_INFO_REVIEW_SIZE, $rInfo->reviews_text_size)];
-        $contents[] = ['text' => sprintf(TEXT_INFO_PRODUCTS_AVERAGE_RATING, number_format($rInfo->average_rating, 2))];
+        $contents[] = ['text' => sprintf(TEXT_INFO_PRODUCTS_AVERAGE_RATING, $rInfo->product->get('review_rating'))];
       }
     }
 

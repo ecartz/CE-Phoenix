@@ -12,13 +12,11 @@
 
   include 'includes/application_top.php';
 
-  if (!isset($_SESSION['customer_id'])) die;
-
 // Check download.php was called with proper GET parameters
-  if (!is_numeric($_GET['order'] ?? null) || !is_numeric($_GET['id'] ?? null) ) {
-    die;
+  if (isset($_SESSION['customer_id']) || !is_numeric($_GET['order'] ?? null) || !is_numeric($_GET['id'] ?? null) ) {
+    die();
   }
-  
+
 // Check that order_id, customer_id and filename match
   $downloads_query = tep_db_query(sprintf(<<<'EOSQL'
 SELECT opd.orders_products_filename
@@ -36,12 +34,16 @@ SELECT opd.orders_products_filename
     AND os.language_id = %d
 EOSQL
     , (int)$_SESSION['customer_id'], (int)$_GET['order'], (int)$_GET['id'], (int)$_SESSION['languages_id']));
-  if (!tep_db_num_rows($downloads_query)) die;
+  if (!mysqli_num_rows($downloads_query)) {
+    die();
+  }
   $downloads = tep_db_fetch_array($downloads_query);
 
 // Die if file is not there
-  if (!file_exists(DIR_FS_CATALOG . 'download/' . $downloads['orders_products_filename'])) die;
-  
+  if (!file_exists(DIR_FS_CATALOG . 'download/' . $downloads['orders_products_filename'])) {
+    die();
+  }
+
 // Now decrement counter
   tep_db_query("UPDATE orders_products_download SET download_count = download_count-1 WHERE orders_products_download_id = " . (int)$_GET['id']);
 
@@ -50,12 +52,13 @@ EOSQL
 // The directory is "hidden", i.e. starts with '.'
 function tep_random_name() {
   $letters = 'abcdefghijklmnopqrstuvwxyz';
+
   $dirname = '.';
-  $length = floor(tep_rand(16,20));
+  $length = random_int(16, 20);
   for ($i = 1; $i <= $length; $i++) {
-   $q = floor(tep_rand(1,26));
-   $dirname .= $letters[$q];
+    $dirname .= $letters[random_int(0, 25)];
   }
+
   return $dirname;
 }
 
@@ -74,7 +77,7 @@ function tep_unlink_temp_dir($dir) {
       if ($file == '.' || $file == '..') continue;
       @unlink($dir . $subdir . '/' . $file);
     }
-    closedir($h2); 
+    closedir($h2);
     @rmdir($dir . $subdir);
   }
   closedir($h1);

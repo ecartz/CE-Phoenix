@@ -15,6 +15,9 @@ pd.*, p.*,
     p.products_quantity AS in_stock,
     IF(s.status, 1, 0) AS is_special,
     IF(s.status, s.expires_date, NULL) AS special_expiration,
+    IF(p.products_date_available IS NULL,
+       NULL,
+       DATE_FORMAT(p.products_date_available, '%Y-%m-%d')) AS products_date_available,
     IF(COALESCE(a.attribute_count, 0) > 0, 1, 0) AS has_attributes
 EOSQL;
 

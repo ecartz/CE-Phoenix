@@ -104,8 +104,8 @@ EOSQL
 
   if ( (DISPLAY_PRICE_WITH_TAX == 'true') && (tep_not_null($pfrom) || tep_not_null($pto)) ) {
     if (isset($_SESSION['customer_id'])) {
-      $country_id = $customer->get_country_id();
-      $zone_id = $customer->get_zone_id();
+      $country_id = $customer->get('country_id');
+      $zone_id = $customer->get('zone_id');
     } else {
       $country_id = STORE_COUNTRY;
       $zone_id = STORE_ZONE;
@@ -114,8 +114,8 @@ EOSQL
     LEFT JOIN tax_rates tr ON p.products_tax_class_id = tr.tax_class_id
     LEFT JOIN zones_to_geo_zones gz
       ON tr.tax_zone_id = gz.geo_zone_id
-     AND (gz.zone_country_id IS NULL OR gz.zone_country_id = '0' OR gz.zone_country_id = %d)
-     AND (gz.zone_id IS NULL OR gz.zone_id = '0' OR gz.zone_id = %d)
+     AND (gz.zone_country_id IS NULL OR gz.zone_country_id = 0 OR gz.zone_country_id = %d)
+     AND (gz.zone_id IS NULL OR gz.zone_id = 0 OR gz.zone_id = %d)
 EOSQL
     , (int)$country_id, (int)$zone_id);
   }

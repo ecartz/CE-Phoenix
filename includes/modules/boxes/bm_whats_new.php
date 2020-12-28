@@ -18,13 +18,13 @@
 
     function execute() {
       $random_query = tep_db_query("SELECT products_id FROM products WHERE products_status = 1 ORDER BY products_id DESC LIMIT " . (int)MODULE_BOXES_WHATS_NEW_MAX_RANDOM_SELECT_NEW);
-      $num_rows = tep_db_num_rows($random_query);
-      if (!$num_rows) {
+      $last_row = mysqli_num_rows($random_query) - 1;
+      if ($last_row < 0) {
         return;
       }
 
-      tep_db_data_seek($random_query, tep_rand(0, ($num_rows - 1)));
-      $random_selection = tep_db_fetch_array($random_query);
+      $random_query->data_seek(($last_row > 0) ? mt_rand(0, $last_row) : 0);
+      $random_selection = $random_query->fetch_assoc();
 
       $product = product_by_id::build((int)$random_selection['products_id']);
 

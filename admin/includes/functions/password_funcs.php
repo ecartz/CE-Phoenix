@@ -63,7 +63,7 @@
     $password = '';
 
     for ($i=0; $i<10; $i++) {
-      $password .= tep_rand();
+      $password .= mt_rand();
     }
 
     $salt = substr(md5($password), 0, 2);

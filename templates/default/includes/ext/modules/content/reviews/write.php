@@ -20,20 +20,18 @@
   <h2 class="display-4 col-sm-4 text-left text-sm-right"><?= $product->hype_price() ?></h2>
 </div>
 
-<?php
-  echo tep_draw_form('review', tep_href_link('ext/modules/content/reviews/write.php', 'action=process&products_id=' . (int)$_GET['products_id'], 'SSL'), 'post', 'enctype="multipart/form-data"', true);
-?>
+<?= tep_draw_form('review', tep_href_link('ext/modules/content/reviews/write.php', 'action=process&products_id=' . (int)$_GET['products_id']), 'post', 'enctype="multipart/form-data"', true) ?>
 
   <div class="alert alert-warning" role="alert">
-    <?= sprintf(TEXT_REVIEW_WRITING, htmlspecialchars($customer->get_short_name()), $product->get('name')) ?>
+    <?= sprintf(TEXT_REVIEW_WRITING, htmlspecialchars($customer->get('short_name')), $product->get('name')) ?>
   </div>
 
   <div class="form-group row">
     <label for="inputNickName" class="col-form-label col-sm-3 text-left text-sm-right"><?= SUB_TITLE_FROM ?></label>
     <div class="col-sm-9">
-      <?php
-  echo tep_draw_input_field('nickname', htmlspecialchars($customer->get_short_name()), 'required aria-required="true" id="inputNickName" placeholder="' . SUB_TITLE_REVIEW_NICKNAME . '"');
-  echo FORM_REQUIRED_INPUT;
+      <?=
+  tep_draw_input_field('nickname', htmlspecialchars($customer->get('short_name')), 'required aria-required="true" id="inputNickName" placeholder="' . SUB_TITLE_REVIEW_NICKNAME . '"'),
+  FORM_REQUIRED_INPUT
 ?>
     </div>
   </div>
@@ -41,9 +39,9 @@
   <div class="form-group row">
     <label for="inputReview" class="col-form-label col-sm-3 text-left text-sm-right"><?= SUB_TITLE_REVIEW ?></label>
     <div class="col-sm-9">
-<?php
-  echo tep_draw_textarea_field('review', 'soft', 60, 15, null, 'required aria-required="true" id="inputReview" placeholder="' . SUB_TITLE_REVIEW_TEXT . '"');
-  echo FORM_REQUIRED_INPUT;
+<?=
+  tep_draw_textarea_field('review', 'soft', 60, 15, null, 'required aria-required="true" id="inputReview" placeholder="' . SUB_TITLE_REVIEW_TEXT . '"'),
+  FORM_REQUIRED_INPUT
 ?>
     </div>
   </div>
@@ -62,9 +60,7 @@
     </div>
   </div>
 
-  <?php
-  echo $OSCOM_Hooks->call('write', 'injectFormDisplay');
-  ?>
+  <?= $OSCOM_Hooks->call('write', 'injectFormDisplay') ?>
 
   <div class="buttonSet">
     <div class="text-right"><?= tep_draw_button(IMAGE_BUTTON_ADD_REVIEW, 'fas fa-pen', null, 'primary', null, 'btn-success btn-lg btn-block') ?></div>

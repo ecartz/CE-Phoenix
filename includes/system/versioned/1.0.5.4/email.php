@@ -51,7 +51,6 @@
     public function __construct($headers = []) {
       $this->lf = ((EMAIL_LINEFEED == 'CRLF') ? "\r\n" : "\n");
 
-
       $this->build_params['html_encoding'] = 'quoted-printable';
       $this->build_params['text_encoding'] = '7bit';
       $this->build_params['html_charset'] = constant('CHARSET');
@@ -319,26 +318,22 @@
 
       $message = $this->_build_message();
 
-      if ( is_object($message) ) {
-        if (tep_not_null($this->attachments)) {
-          foreach ($this->attachments as $attachment) {
-            $message->addSubpart($attachment['body'], $this->get_parameters('attachment', $attachment));
-          }
-        }
-
-        $output = $message->encode();
-        $this->output = $output['body'];
-
-        foreach($output['headers'] as $key => $value) {
-          $headers[] = $key . ': ' . $value;
-        }
-
-        $this->headers = array_merge($this->headers, $headers);
-
-        return true;
-      } else {
+      if ( !is_object($message) ) {
         return false;
       }
+
+      foreach ($this->attachments as $attachment) {
+        $message->addSubpart($attachment['body'], $this->get_parameters('attachment', $attachment));
+      }
+
+      $output = $message->encode();
+      $this->output = $output['body'];
+
+      foreach ($output['headers'] as $key => $value) {
+        $this->headers[] = $key . ': ' . $value;
+      }
+
+      return true;
     }
 
     public function normalize_headers($headers = []) {
@@ -356,6 +351,17 @@
       }
 
       return $xtra_headers;
+    }
+
+    public function encode_if_necessary($header_value) {
+      if ( function_exists('mb_detect_encoding')
+         ? (mb_detect_encoding($header_value, ['ASCII', 'UTF-8']) === 'UTF-8')
+         : (md5(iconv('ASCII', 'ASCII//IGNORE', $header_value)) !== md5($header_value)))
+      {
+        return '=?utf-8?B?' . base64_encode($header_value) . '?=';
+      }
+
+      return $header_value;
     }
 
     public function format_address($address, $name = '') {
@@ -379,15 +385,23 @@
       $from = $this->format_address($from_addr, $from_name);
 
       if (defined('EMAIL_FROM')) {
-        $sender_headers = ['From: ' . EMAIL_FROM, 'Reply-to: ' . $from];
         $from_addr = EMAIL_FROM;
+        $sender_headers = [
+          'From: ' . $this->encode_if_necessary(EMAIL_FROM),
+          'Reply-to: ' . $this->encode_if_necessary($from),
+        ];
       } else {
-        $sender_headers = ['From: ' . $from];
+        $sender_headers = ['From: ' . $this->encode_if_necessary($from)];
       }
 
       $headers = array_merge($this->headers, $sender_headers, $this->normalize_headers($headers));
 
-      return mail($to, $subject, $this->output, implode($this->lf, $headers), "-f$from_addr");
+      return mail(
+        $this->encode_if_necessary($to),
+        $this->encode_if_necessary($subject),
+        $this->output,
+        implode($this->lf, $headers),
+        "-f$from_addr");
     }
 
 /**

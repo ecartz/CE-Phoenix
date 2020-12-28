@@ -15,9 +15,9 @@
     public static function execute() {
       if (isset($_POST['products_id'])) {
         $pid = (int)$_POST['products_id'];
-        $attributes = $_POST['id'] ?? '';
+        $attributes = $_POST['id'] ?? null;
 
-        $qty = empty($_POST['qty']) ? 1: (int)$_POST['qty'];
+        $qty = empty($_POST['qty']) ? 1 : (int)$_POST['qty'];
 
         $name = $_SESSION['cart']->add_cart($_POST['products_id'], $_SESSION['cart']->get_quantity(Product::build_uprid($pid, $attributes))+$qty, $attributes);
 

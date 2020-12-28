@@ -167,5 +167,5 @@
   }
 
   function tep_reset_session_token() {
-    $_SESSION['sessiontoken'] = md5(tep_rand() . tep_rand() . tep_rand() . tep_rand());
+    $_SESSION['sessiontoken'] = md5(mt_rand() . mt_rand() . mt_rand() . mt_rand());
   }
