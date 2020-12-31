@@ -70,14 +70,14 @@
 
 ////
 // Return a random row from a database query
-  function tep_random_select($query) {
+  function tep_random_select($sql) {
     $random_product = '';
-    $random_query = tep_db_query($query);
-    $num_rows = mysqli_num_rows($random_query);
-    if ($num_rows > 0) {
-      $random_row = tep_rand(0, ($num_rows - 1));
-      tep_db_data_seek($random_query, $random_row);
-      $random_product = tep_db_fetch_array($random_query);
+    $random_query = tep_db_query($sql);
+    $last_row = mysqli_num_rows($random_query) - 1;
+    if ($last_row >= 0) {
+      $random_row = ($last_row > 0) ? mt_rand(0, $last_row) : 0;
+      $random_query->data_seek($random_row);
+      $random_product = $random_query->fetch_assoc();
     }
 
     return $random_product;
@@ -87,7 +87,9 @@
 // Return a product's name
 // TABLES: products
   function tep_get_products_name($product_id, $language_id = null) {
-    if (empty($language_id)) $language_id = $_SESSION['languages_id'];
+    if (empty($language_id)) {
+      $language_id = $_SESSION['languages_id'];
+    }
 
     $product_query = tep_db_query("SELECT products_name FROM products_description WHERE products_id = " . (int)$product_id . " AND language_id = " . (int)$language_id);
     $product = tep_db_fetch_array($product_query);
@@ -141,33 +143,18 @@
 ////
 // Returns an array with countries
 // TABLES: countries
-  function tep_get_countries($countries_id = '', $with_iso_codes = false) {
-    $countries_array = [];
-    if (tep_not_null($countries_id)) {
-      if ($with_iso_codes == true) {
-        $countries = tep_db_query("SELECT countries_name, countries_iso_code_2, countries_iso_code_3 FROM countries WHERE countries_id = " . (int)$countries_id . " ORDER BY countries_name");
-        $countries_values = tep_db_fetch_array($countries);
-        $countries_array = [
-          'countries_name' => $countries_values['countries_name'],
-          'countries_iso_code_2' => $countries_values['countries_iso_code_2'],
-          'countries_iso_code_3' => $countries_values['countries_iso_code_3'],
-        ];
-      } else {
-        $countries = tep_db_query("SELECT countries_name FROM countries WHERE countries_id = " . (int)$countries_id);
-        $countries_values = tep_db_fetch_array($countries);
-        $countries_array = ['countries_name' => $countries_values['countries_name']];
-      }
-    } else {
-      $countries = tep_db_query("SELECT countries_id, countries_name FROM countries ORDER BY countries_name");
-      while ($countries_values = tep_db_fetch_array($countries)) {
-        $countries_array[] = [
-          'countries_id' => $countries_values['countries_id'],
-          'countries_name' => $countries_values['countries_name'],
-        ];
-      }
+  function tep_get_countries($countries_id = null, $with_iso_codes = false) {
+    if (empty($countries_id)) {
+      return $GLOBALS['db']->fetch_all("SELECT countries_id, countries_name FROM countries ORDER BY countries_name");
     }
 
-    return $countries_array;
+    if ($with_iso_codes) {
+      $countries_query = tep_db_query("SELECT countries_name, countries_iso_code_2, countries_iso_code_3 FROM countries WHERE countries_id = " . (int)$countries_id . " ORDER BY countries_name");
+      return $countries_query->fetch_assoc();
+    }
+
+    $countries_query = tep_db_query("SELECT countries_name FROM countries WHERE countries_id = " . (int)$countries_id);
+    return $countries_query->fetch_assoc();
   }
 
 ////
@@ -222,12 +209,9 @@
 // TABLES: zones
   function tep_get_zone_name($country_id, $zone_id, $default_zone) {
     $zone_query = tep_db_query("SELECT zone_name FROM zones WHERE zone_country_id = " . (int)$country_id . " AND zone_id = " . (int)$zone_id);
-    if (mysqli_num_rows($zone_query)) {
-      $zone = tep_db_fetch_array($zone_query);
-      return $zone['zone_name'];
-    } else {
-      return $default_zone;
-    }
+    $zone = $zone_query->fetch_assoc();
+
+    return $zone['zone_name'] ?? $default_zone;
   }
 
 ////
@@ -235,7 +219,7 @@
 // TABLES: zones
   function tep_get_zone_code($country_id, $zone_id, $default_zone) {
     $zone_query = tep_db_query("SELECT zone_code FROM zones WHERE zone_country_id = " . (int)$country_id . " AND zone_id = " . (int)$zone_id);
-    $zone = tep_db_fetch_array($zone_query);
+    $zone = $zone_query->fetch_assoc();
 
     return $zone ? $zone['zone_code'] : $default_zone;
   }
@@ -271,7 +255,7 @@
     if ( ($country_id == -1) && ($zone_id == -1) ) {
       global $customer;
 
-      if (isset($customer) && is_object($customer) && is_a($customer, 'customer')) {
+      if (isset($customer) && ($customer instanceof customer)) {
         $country_id = $customer->get_country_id();
         $zone_id = $customer->get_zone_id();
       } else {
@@ -281,10 +265,10 @@
     }
 
     if (!isset($tax_rates[$class_id][$country_id][$zone_id]['rate'])) {
-      $tax_query = tep_db_query("SELECT sum(tax_rate) AS tax_rate FROM tax_rates tr LEFT JOIN zones_to_geo_zones za ON (tr.tax_zone_id = za.geo_zone_id) LEFT JOIN geo_zones tz ON (tz.geo_zone_id = tr.tax_zone_id) WHERE (za.zone_country_id is null or za.zone_country_id = '0' or za.zone_country_id = " . (int)$country_id . ") AND (za.zone_id is null or za.zone_id = '0' or za.zone_id = " . (int)$zone_id . ") AND tr.tax_class_id = " . (int)$class_id . " group by tr.tax_priority");
+      $tax_query = tep_db_query("SELECT SUM(tax_rate) AS tax_rate FROM tax_rates tr LEFT JOIN zones_to_geo_zones za ON (tr.tax_zone_id = za.geo_zone_id) LEFT JOIN geo_zones tz ON (tz.geo_zone_id = tr.tax_zone_id) WHERE (za.zone_country_id is null or za.zone_country_id = '0' or za.zone_country_id = " . (int)$country_id . ") AND (za.zone_id is null or za.zone_id = '0' or za.zone_id = " . (int)$zone_id . ") AND tr.tax_class_id = " . (int)$class_id . " group by tr.tax_priority");
       if (mysqli_num_rows($tax_query)) {
         $tax_multiplier = 1.0;
-        while ($tax = tep_db_fetch_array($tax_query)) {
+        while ($tax = $tax_query->fetch_assoc()) {
           $tax_multiplier *= 1.0 + ($tax['tax_rate'] / 100);
         }
 
@@ -813,28 +797,17 @@
     return $value;
   }
 
-  function tep_array_to_string($array, $excludes = [], $equals = '=', $separator = '&') {
+  function tep_array_to_string($data, $excludes = [], $equals = '=', $separator = '&') {
     $get_string = '';
-    foreach ($array as $key => $value) {
-      if ( (!in_array($key, $excludes)) && ($key != 'x') && ($key != 'y') ) {
-        $get_string .= $key . $equals . $value . $separator;
-      }
-    }
 
-    $displacement = -strlen($separator);
-    if (substr($get_string, $displacement) === $separator) {
-      $get_string = substr($get_string, 0, $displacement);
-    }
-
-    return $get_string;
+    $data = array_diff_key($data, $excludes, ['x', 'y']);
+    return implode($separator, array_map(function ($k, $v) use ($equals) {
+      return "$k$equals$v";
+    }, array_keys($data), $data));
   }
 
   function tep_not_null($value) {
-    if (is_array($value)) {
-      return count($value) > 0;
-    }
-
-    return (($value != '') && (strtolower($value) != 'null') && (strlen(trim($value)) > 0));
+    return !Any::is_empty($value);
   }
 
 ////
@@ -941,6 +914,7 @@
 
 // nl2br() prior PHP 4.2.0 did not convert linefeeds on all OSs (it only converted \n)
   function tep_convert_linefeeds($from, $to, $string) {
+    trigger_error('The tep_convert_linefeeds function has been deprecated.', E_USER_DEPRECATED);
     return str_replace($from, $to, $string);
   }
 
@@ -990,10 +964,5 @@
   }
 
   function tep_ltrim_once($s, $prefix) {
-    $length = strlen($prefix);
-    if (substr($s, 0, $length) === $prefix) {
-      return substr($s, $length);
-    }
-
-    return $s;
+    return Text::ltrim_once($s, $prefix);
   }
