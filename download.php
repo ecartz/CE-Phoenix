@@ -37,7 +37,7 @@ EOSQL
   if (!mysqli_num_rows($downloads_query)) {
     die();
   }
-  $downloads = tep_db_fetch_array($downloads_query);
+  $downloads = $downloads_query->fetch_assoc();
 
 // Die if file is not there
   if (!file_exists(DIR_FS_CATALOG . 'download/' . $downloads['orders_products_filename'])) {
