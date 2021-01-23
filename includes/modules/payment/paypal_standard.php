@@ -415,7 +415,7 @@
 
         foreach ( $_POST as $key => $value ) {
           if ( $key != 'cmd' ) {
-            $parameters .= $key . '=' . urlencode(stripslashes($value)) . '&';
+            $parameters .= $key . '=' . urlencode($value) . '&';
           }
         }
 
@@ -424,11 +424,11 @@
         $result = $this->_app->makeApiCall($this->form_action_url, $parameters);
 
         foreach ( $_POST as $key => $value ) {
-          $pptx_params[$key] = stripslashes($value);
+          $pptx_params[$key] = $value;
         }
 
         foreach ( $_GET as $key => $value ) {
-          $pptx_params['GET ' . $key] = stripslashes($value);
+          $pptx_params['GET ' . $key] = $value;
         }
 
         $this->_app->log('PS', '_notify-validate', ($result == 'VERIFIED') ? 1 : -1, $pptx_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox');
@@ -436,7 +436,7 @@
         if ( !Text::is_empty(OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN) ) {
           $pptx_params['cmd'] = '_notify-synch';
 
-          $parameters = 'cmd=_notify-synch&tx=' . urlencode(stripslashes($_GET['tx'])) . '&at=' . urlencode(OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN);
+          $parameters = 'cmd=_notify-synch&tx=' . urlencode($_GET['tx']) . '&at=' . urlencode(OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN);
 
           $pdt_raw = $this->_app->makeApiCall($this->form_action_url, $parameters);
 
@@ -465,12 +465,12 @@
           }
 
           foreach ( $_GET as $key => $value ) {
-            $pptx_params['GET ' . $key] = stripslashes($value);
+            $pptx_params['GET ' . $key] = $value;
           }
 
           $this->_app->log('PS', $pptx_params['cmd'], ($result == 'VERIFIED') ? 1 : -1, $pptx_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox');
         } else {
-          $details = $this->_app->getApiResult('APP', 'GetTransactionDetails', ['TRANSACTIONID' => stripslashes($_GET['tx'])], (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox');
+          $details = $this->_app->getApiResult('APP', 'GetTransactionDetails', ['TRANSACTIONID' => $_GET['tx']], (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox');
 
           if ( in_array($details['ACK'], ['Success', 'SuccessWithWarning']) ) {
             $result = 'VERIFIED';
@@ -492,11 +492,11 @@
         }
       } else {
         foreach ( $_POST as $key => $value ) {
-          $pptx_params[$key] = stripslashes($value);
+          $pptx_params[$key] = $value;
         }
 
         foreach ( $_GET as $key => $value ) {
-          $pptx_params['GET ' . $key] = stripslashes($value);
+          $pptx_params['GET ' . $key] = $value;
         }
 
         $this->_app->log('PS', 'UNKNOWN', ($result == 'VERIFIED') ? 1 : -1, $pptx_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox');

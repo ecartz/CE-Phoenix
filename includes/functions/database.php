@@ -128,7 +128,7 @@
 
   function tep_db_prepare_input($input) {
     if (is_string($input)) {
-      return trim(tep_sanitize_string(stripslashes($input)));
+      return trim(tep_sanitize_string($input));
     }
 
     if (is_array($input)) {

@@ -170,7 +170,7 @@
 
   function tep_db_prepare_input($string) {
     if (is_string($string)) {
-      return trim(stripslashes($string));
+      return trim($string);
     }
 
     if (is_array($string)) {

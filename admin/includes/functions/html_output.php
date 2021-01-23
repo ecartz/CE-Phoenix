@@ -169,7 +169,7 @@ EOERROR
     if ( $reinsert_value ) {
       $request = $_GET[$name] ?? $_POST[$name] ?? null;
       if (is_string($request)) {
-        $value = stripslashes($request);
+        $value = $request;
       }
     }
 
@@ -201,7 +201,7 @@ EOERROR
     if (tep_not_null($value)) $selection .= ' value="' . tep_output_string($value) . '"';
 
     $request = $_GET[$name] ?? $_POST[$name] ?? null;
-    if ( $checked || (is_string($request) && (('on' === $request) || (stripslashes($request) == $value))) ) {
+    if ( $checked || (is_string($request) && (('on' === $request) || ($request == $value))) ) {
       $selection .= ' checked="checked"';
     }
 
@@ -238,7 +238,7 @@ EOERROR
     $field .= '>';
 
     if ( $reinsert_value && is_string($requested_value = $_GET[$name] ?? $_POST[$name] ?? null) ) {
-      $field .= htmlspecialchars(stripslashes($requested_value));
+      $field .= htmlspecialchars($requested_value);
     } elseif (tep_not_null($text)) {
       $field .= htmlspecialchars($text);
     }
@@ -258,7 +258,7 @@ EOERROR
     } else {
       $requested_value = $_GET[$name] ?? $_POST[$name] ?? null;
       if ( is_string($requested_value) ) {
-        $field .= ' value="' . tep_output_string(stripslashes($requested_value)) . '"';
+        $field .= ' value="' . tep_output_string($requested_value) . '"';
       }
     }
 
@@ -296,7 +296,7 @@ EOERROR
     if ( empty($default) ) {
       $request = $_GET[$name] ?? $_POST[$name] ?? null;
       if (is_string($request)) {
-        $default = stripslashes($request);
+        $default = $request;
       }
     }
 

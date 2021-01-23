@@ -24,7 +24,7 @@
 
   $seller_accounts = [$paypal_standard->_app->getCredentials('PS', 'email')];
 
-  if ( tep_not_null($paypal_standard->_app->getCredentials('PS', 'email_primary')) ) {
+  if ( !Text::is_empty($paypal_standard->_app->getCredentials('PS', 'email_primary')) ) {
     $seller_accounts[] = $paypal_standard->_app->getCredentials('PS', 'email_primary');
   }
 
@@ -33,7 +33,7 @@
 
     foreach ( $_POST as $key => $value ) {
       if ( $key != 'cmd' ) {
-        $parameters .= $key . '=' . urlencode(stripslashes($value)) . '&';
+        $parameters .= $key . '=' . urlencode($value) . '&';
       }
     }
 
@@ -45,11 +45,11 @@
   $log_params = [];
 
   foreach ( $_POST as $key => $value ) {
-    $log_params[$key] = stripslashes($value);
+    $log_params[$key] = $value;
   }
 
   foreach ( $_GET as $key => $value ) {
-    $log_params['GET ' . $key] = stripslashes($value);
+    $log_params['GET ' . $key] = $value;
   }
 
   $paypal_standard->_app->log('PS', '_notify-validate', ($result == 'VERIFIED') ? 1 : -1, $log_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox', true);
@@ -65,7 +65,7 @@
 
     $check_query = tep_db_query("SELECT orders_status FROM orders WHERE orders_id = " . (int)$order_id . " AND customers_id = " . (int)$customer_id);
 
-    if ($check = tep_db_fetch_array($check_query)) {
+    if ($check = $check_query->fetch_assoc()) {
       if ( $check['orders_status'] == OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID ) {
         $order = new order($order_id);
         $order->info['order_status'] = DEFAULT_ORDERS_STATUS_ID;
@@ -79,7 +79,7 @@
         if ('true' === DOWNLOAD_ENABLED) {
           $downloads_query = tep_db_query("SELECT opd.orders_products_filename FROM orders o, orders_products op, orders_products_download opd WHERE o.orders_id = " . (int)$order_id . " AND o.customers_id = " . (int)$customer_id . " AND o.orders_id = op.orders_id AND op.orders_products_id = opd.orders_products_id AND opd.orders_products_filename != ''");
 
-          switch (tep_db_num_rows($downloads_query)) {
+          switch (mysqli_num_rows($downloads_query)) {
             case 0:
               $order->content_type = 'physical';
               break;

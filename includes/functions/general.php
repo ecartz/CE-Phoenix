@@ -126,7 +126,7 @@
     $get_url = '';
     foreach ($_GET ?? [] as $key => $value) {
       if ( is_string($value) && (strlen($value) > 0) && !in_array($key, $excludes) ) {
-        $get_url .= $key . '=' . rawurlencode(stripslashes($value)) . '&';
+        $get_url .= $key . '=' . rawurlencode($value) . '&';
       }
     }
 

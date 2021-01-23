@@ -164,7 +164,7 @@
 
       if ($order->billing['country']['iso_code_2'] == 'US') {
         $billing_state_query = tep_db_query("SELECT zone_code FROM zones WHERE zone_id = " . (int)$order->billing['zone_id']);
-        $billing_state = tep_db_fetch_array($billing_state_query);
+        $billing_state = $billing_state_query->fetch_assoc();
 
         $process_button_string .= tep_draw_hidden_field('Bstate', $billing_state['zone_code']);
       } else {
@@ -195,12 +195,12 @@
     }
 
     public function get_error() {
-      if (isset($_GET['ErrMsg']) && tep_not_null($_GET['ErrMsg'])) {
-        $error = stripslashes(urldecode($_GET['ErrMsg']));
-      } elseif (isset($_GET['Err']) && tep_not_null($_GET['Err'])) {
-        $error = stripslashes(urldecode($_GET['Err']));
-      } elseif (isset($_GET['error']) && tep_not_null($_GET['error'])) {
-        $error = stripslashes(urldecode($_GET['error']));
+      if (isset($_GET['ErrMsg']) && !Text::is_empty($_GET['ErrMsg'])) {
+        $error = urldecode($_GET['ErrMsg']);
+      } elseif (isset($_GET['Err']) && !Text::is_empty($_GET['Err'])) {
+        $error = urldecode($_GET['Err']);
+      } elseif (isset($_GET['error']) && !Text::is_empty($_GET['error'])) {
+        $error = urldecode($_GET['error']);
       } else {
         $error = MODULE_PAYMENT_PSIGATE_TEXT_ERROR_MESSAGE;
       }

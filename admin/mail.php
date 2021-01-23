@@ -70,7 +70,7 @@
       $mimemessage->build_message();
 
       $count = 0;
-      while ($mail = tep_db_fetch_array($mail_query)) {
+      while ($mail = $mail_query->fetch_assoc()) {
         if ($mimemessage->send($customer_data->get('name', $mail), $customer_data->get('email_address', $mail), $from_name, $from_address, $subject)) {
           $count++;
         }
@@ -88,7 +88,7 @@
   require 'includes/template_top.php';
 ?>
 
-  <h1 class="display-4 mb-2"><?= HEADING_TITLE; ?></h1>
+  <h1 class="display-4 mb-2"><?= HEADING_TITLE ?></h1>
 
 <?php
   if ( ($action == 'preview') ) {
@@ -97,41 +97,40 @@
 
       <table class="table table-striped">
         <tr>
-          <th><?= TEXT_CUSTOMER; ?></th>
-          <td><?= $mail_sent_to; ?></td>
+          <th><?= TEXT_CUSTOMER ?></th>
+          <td><?= $mail_sent_to ?></td>
         </tr>
         <tr>
-          <th><?= TEXT_FROM; ?></th>
-          <td><?= htmlspecialchars(stripslashes($_POST['from_name'])); ?></td>
+          <th><?= TEXT_FROM ?></th>
+          <td><?= htmlspecialchars($_POST['from_name']) ?></td>
         </tr>
         <tr>
-          <th><?= TEXT_FROM_ADDRESS; ?></th>
-          <td><?= htmlspecialchars(stripslashes($_POST['from_address'])); ?></td>
+          <th><?= TEXT_FROM_ADDRESS ?></th>
+          <td><?= htmlspecialchars($_POST['from_address']) ?></td>
         </tr>
         <tr>
-          <th><?= TEXT_SUBJECT; ?></th>
-          <td><?= htmlspecialchars(stripslashes($_POST['subject'])); ?></td>
+          <th><?= TEXT_SUBJECT ?></th>
+          <td><?= htmlspecialchars($_POST['subject']) ?></td>
         </tr>
         <tr>
-          <th><?= TEXT_MESSAGE; ?></th>
-          <td><?= nl2br(htmlspecialchars(stripslashes($_POST['message']))); ?></td>
+          <th><?= TEXT_MESSAGE ?></th>
+          <td><?= nl2br(htmlspecialchars($_POST['message'])) ?></td>
         </tr>
-        <?= $OSCOM_Hooks->call('mail', 'formPreview'); ?>
+        <?= $OSCOM_Hooks->call('mail', 'formPreview') ?>
       </table>
 
 <?php
     /* Re-Post all POST'ed variables */
     foreach ($_POST as $key => $value) {
       if (!is_array($_POST[$key])) {
-        echo tep_draw_hidden_field($key, htmlspecialchars(stripslashes($value)));
+        echo tep_draw_hidden_field($key, htmlspecialchars($value));
       }
     }
 ?>
 
       <div class="buttonSet">
-<?php
-    echo tep_draw_bootstrap_button(IMAGE_SEND_EMAIL, 'fas fa-paper-plane', null, 'primary', null, 'btn-success btn-block btn-lg');
-    echo tep_draw_bootstrap_button(IMAGE_CANCEL, 'fas fa-angle-left', tep_href_link('mail.php'), 'primary', null, 'btn-light mt-2');
+<?= tep_draw_bootstrap_button(IMAGE_SEND_EMAIL, 'fas fa-paper-plane', null, 'primary', null, 'btn-success btn-block btn-lg'),
+    tep_draw_bootstrap_button(IMAGE_CANCEL, 'fas fa-angle-left', tep_href_link('mail.php'), 'primary', null, 'btn-light mt-2')
 ?>
       </div>
     </form>
@@ -146,7 +145,7 @@
 
     $sql = $customer_data->add_order_by($customer_data->build_read(['sortable_name', 'email_address'], 'customers'), ['sortable_name']);
     $mail_query = tep_db_query($sql);
-    while ($customers_values = tep_db_fetch_array($mail_query)) {
+    while ($customers_values = $mail_query->fetch_assoc()) {
       $customers[] = [
         'id' => $customer_data->get('email_address', $customers_values),
         'text' => $customer_data->get('sortable_name', $customers_values) . ' (' . $customer_data->get('email_address', $customers_values) . ')',
@@ -155,44 +154,44 @@
 ?>
 
       <div class="form-group row" id="zCustomer">
-        <label for="Customer" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_CUSTOMER; ?></label>
+        <label for="Customer" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_CUSTOMER ?></label>
         <div class="col-sm-9">
-          <?= tep_draw_pull_down_menu('customers_email_address', $customers, ($_GET['customer'] ?? ''), 'id="Customer" required aria-required="true"'); ?>
+          <?= tep_draw_pull_down_menu('customers_email_address', $customers, ($_GET['customer'] ?? ''), 'id="Customer" required aria-required="true"') ?>
         </div>
       </div>
 
       <div class="form-group row" id="zFromName">
-        <label for="FromName" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_FROM; ?></label>
+        <label for="FromName" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_FROM ?></label>
         <div class="col-sm-9">
-          <?= tep_draw_input_field('from_name', STORE_OWNER, 'id="FromName" required aria-required="true"'); ?>
+          <?= tep_draw_input_field('from_name', STORE_OWNER, 'id="FromName" required aria-required="true"') ?>
         </div>
       </div>
 
       <div class="form-group row" id="zFromAddress">
-        <label for="FromAddress" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_FROM_ADDRESS; ?></label>
+        <label for="FromAddress" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_FROM_ADDRESS ?></label>
         <div class="col-sm-9">
-          <?= tep_draw_input_field('from_address', STORE_OWNER_EMAIL_ADDRESS, 'id="FromAddress" required aria-required="true"'); ?>
+          <?= tep_draw_input_field('from_address', STORE_OWNER_EMAIL_ADDRESS, 'id="FromAddress" required aria-required="true"') ?>
         </div>
       </div>
 
       <div class="form-group row" id="zSubject">
-        <label for="Subject" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_SUBJECT; ?></label>
+        <label for="Subject" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_SUBJECT ?></label>
         <div class="col-sm-9">
-          <?= tep_draw_input_field('subject', null, 'id="Subject" required aria-required="true"'); ?>
+          <?= tep_draw_input_field('subject', null, 'id="Subject" required aria-required="true"') ?>
         </div>
       </div>
 
       <div class="form-group row" id="zMessage">
-        <label for="Message" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_MESSAGE; ?></label>
+        <label for="Message" class="col-form-label col-sm-3 text-left text-sm-right"><?= TEXT_MESSAGE ?></label>
         <div class="col-sm-9">
-          <?= tep_draw_textarea_field('message', 'soft', '60', '15', null, 'id="Message" required aria-required="true"'); ?>
+          <?= tep_draw_textarea_field('message', 'soft', '60', '15', null, 'id="Message" required aria-required="true"') ?>
         </div>
       </div>
 
-      <?= $OSCOM_Hooks->call('mail', 'formNew'); ?>
+      <?= $OSCOM_Hooks->call('mail', 'formNew') ?>
 
       <div class="buttonSet">
-        <?= tep_draw_bootstrap_button(IMAGE_PREVIEW, 'fas fa-eye', null, 'primary', null, 'btn-success btn-block btn-lg'); ?>
+        <?= tep_draw_bootstrap_button(IMAGE_PREVIEW, 'fas fa-eye', null, 'primary', null, 'btn-success btn-block btn-lg') ?>
       </div>
 
     </form>

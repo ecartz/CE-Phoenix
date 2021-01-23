@@ -233,7 +233,7 @@ EOSQL
     if (([] !== $_POST)) {
 /* Re-Post all POST'ed variables */
       foreach($_POST as $key => $value) {
-        echo tep_draw_hidden_field($key, htmlspecialchars(stripslashes($value)));
+        echo tep_draw_hidden_field($key, htmlspecialchars($value));
       }
 ?>
     <div class="text-right">
